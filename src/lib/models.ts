@@ -28,7 +28,7 @@ export interface Skill {
   category: string;
   proficiency: number;
   yearsOfExperience: number;
-  visible: boolean;
+  visible?: boolean;
   createdAt: Date;
 }
 
@@ -40,22 +40,23 @@ export interface Education {
   startDate: Date;
   endDate?: Date;
   description: string;
-  achievements: string[];
+  achievements?: string[];
   location: string;
-  visible: boolean;
+  visible?: boolean;
   createdAt: Date;
 }
 
 export interface Experience {
   _id?: string;
   company: string;
-  position: string;
+  title: string;
+  position?: string;
   startDate: Date;
   endDate?: Date;
   location: string;
   description: string;
-  achievements: string[];
+  achievements?: string[];
   technologies: string[];
-  visible: boolean;
+  visible?: boolean;
   createdAt: Date;
 }

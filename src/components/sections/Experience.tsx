@@ -3,64 +3,62 @@ import { secureReveal } from '@/utils/animations';
 import { useEffect, useState } from 'react';
 import { Experience as ExperienceType } from '@/lib/models';
 
-// Fallback experience data
-const fallbackExperience: ExperienceType[] = [
-  {
-    _id: '1',
-    position: 'Senior Software Engineer',
-    company: 'Tech Corp',
-    location: 'San Francisco, CA',
-    startDate: new Date('2021-01-01'),
-    endDate: undefined,
-    description: 'Led development of microservices architecture\nImplemented CI/CD pipelines\nMentored junior developers',
-    technologies: ['React', 'Node.js', 'AWS', 'Docker'],
-    visible: true,
-    createdAt: new Date(),
-    achievements: [
-      'Led development of microservices architecture',
-      'Implemented CI/CD pipelines',
-      'Mentored junior developers'
-    ]
-  },
-  {
-    _id: '2',
-    position: 'Full Stack Developer',
-    company: 'StartUp Inc',
-    location: 'Remote',
-    startDate: new Date('2019-06-01'),
-    endDate: new Date('2020-12-31'),
-    description: 'Built responsive web applications\nOptimized database performance\nImplemented real-time features',
-    technologies: ['Vue.js', 'Python', 'PostgreSQL', 'Redis'],
-    visible: true,
-    createdAt: new Date(),
-    achievements: [
-      'Built responsive web applications',
-      'Optimized database performance',
-      'Implemented real-time features'
-    ]
-  }
-];
 
 export default function Experience() {
   const [experiences, setExperiences] = useState<ExperienceType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchExperience = async () => {
       try {
         const res = await fetch('/api/experience');
         const data = await res.json();
-        if (data.success) {
-          // Only show visible experience entries
-          setExperiences(data.data.filter((exp: ExperienceType) => exp.visible));
+        console.log('Raw experience data:', data);
+
+        if (data.success && Array.isArray(data.data)) {
+          try {
+            // Validate experience data and convert date strings to Date objects
+            const validExperiences = data.data
+              .filter((exp: ExperienceType) => {
+                // Log each experience object for debugging
+                console.log('Processing experience:', exp);
+                
+                return (
+                  typeof exp.company === 'string' &&
+                  typeof exp.title === 'string' && // Changed from position to title to match API
+                  typeof exp.location === 'string' &&
+                  typeof exp.startDate === 'string' &&
+                  typeof exp.description === 'string' &&
+                  Array.isArray(exp.technologies)
+                );
+              })
+              .map((exp: ExperienceType) => {
+                // Convert dates and split description
+                const processed = {
+                  ...exp,
+                  position: exp.title, // Map title to position
+                  startDate: new Date(exp.startDate),
+                  endDate: exp.endDate ? new Date(exp.endDate) : undefined,
+                  achievements: exp.description.split('•').filter(Boolean).map(s => s.trim())
+                };
+                console.log('Processed experience:', processed);
+                return processed;
+              });
+
+            console.log('Final valid experiences:', validExperiences);
+            setExperiences(validExperiences);
+          } catch (processError) {
+            console.error('Error processing experience data:', processError);
+            setExperiences([]);
+          }
         } else {
-          // Use fallback data if API fails
-          setExperiences(fallbackExperience);
+          console.warn('Invalid API response format');
+          setExperiences([]);
         }
       } catch (error) {
         console.error('Failed to fetch experience:', error);
-        // Use fallback data if API fails
-        setExperiences(fallbackExperience);
+        setExperiences([]);
       } finally {
         setIsLoading(false);
       }
@@ -97,7 +95,7 @@ export default function Experience() {
           variants={secureReveal}
           initial="hidden"
           animate="visible"
-          className="space-y-12"
+          className="space-y-6"
         >
           {isLoading ? (
             // Loading skeletons with neumorphic effect
@@ -142,6 +140,7 @@ export default function Experience() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
                 className="relative pl-8 group"
+                onClick={() => exp._id && setExpandedId(expandedId === exp._id ? null : exp._id)}
               >
                 {/* Timeline Dot with Glow */}
                 <div className="absolute left-0 top-0 -translate-x-1/2 w-3 h-3">
@@ -153,34 +152,27 @@ export default function Experience() {
                 </div>
 
                 <motion.div
-                  whileHover={{ 
-                    scale: 1.02,
-                    boxShadow: '0 8px 16px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.1)'
-                  }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                  className="relative overflow-hidden
+                  layout
+                  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                  className={`relative overflow-hidden
                     bg-gradient-to-br from-[#0D1627] to-[#1A2942]
-                    rounded-xl border border-gray-800 p-8
-                    shadow-[inset_0_2px_4px_rgba(255,255,255,0.05),0_4px_8px_rgba(0,0,0,0.4)]
-                    backdrop-blur-sm hover:border-accent-gold/40 transition-all duration-300"
+                    rounded-lg border border-gray-800 
+                    shadow-[inset_0_2px_4px_rgba(255,255,255,0.05)]
+                    backdrop-blur-sm hover:border-accent-gold/40 transition-all duration-300
+                    cursor-pointer
+                    ${expandedId === exp._id ? 'p-6' : 'p-4'}`}
                 >
-                  {/* Glow Effect */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="absolute inset-0 bg-gradient-to-br from-accent-gold/10 to-transparent" />
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,215,0,0.1),transparent_70%)]" />
-                  </div>
-
-                  <div className="relative space-y-6">
-                    <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div className="space-y-2">
+                    <div className="flex flex-wrap items-start justify-between gap-2">
                       <div>
-                        <h3 className="text-xl font-bold text-secondary-light group-hover:text-accent-gold
+                        <h3 className="text-lg font-bold text-secondary-light group-hover:text-accent-gold
                           transition-colors duration-300">
                           {exp.position}
                         </h3>
-                        <p className="text-secondary-dark mt-1">{exp.company}</p>
+                        <p className="text-secondary-dark text-sm mt-1">{exp.company}</p>
                       </div>
                       <div className="text-right">
-                        <div className="text-sm font-mono text-accent-gold px-3 py-1 rounded-full
+                        <div className="text-xs font-mono text-accent-gold px-2 py-1 rounded-full
                           bg-accent-gold/10 shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]">
                           {new Date(exp.startDate).toLocaleDateString('en-US', { 
                             month: 'short',
@@ -191,44 +183,61 @@ export default function Experience() {
                             year: 'numeric'
                           })}` : ' - Present'}
                         </div>
-                        <div className="text-sm text-secondary-dark mt-1">
+                        <div className="text-xs text-secondary-dark mt-1">
                           {exp.location}
                         </div>
                       </div>
                     </div>
 
-                    <ul className="space-y-3">
-                      {exp.description.split('\n').map((achievement, i) => (
-                        <motion.li
-                          key={i}
-                          whileHover={{ x: 4 }}
-                          className="flex items-start space-x-3 group/item"
-                        >
-                          <span className="mt-2 h-1.5 w-1.5 rounded-full bg-accent-gold
-                            group-hover/item:shadow-[0_0_8px_rgba(255,215,0,0.5)]
-                            transition-shadow duration-300" />
-                          <span className="text-secondary-dark group-hover/item:text-secondary-light
-                            transition-colors duration-300">
-                            {achievement}
-                          </span>
-                        </motion.li>
-                      ))}
-                    </ul>
+                    {/* Expandable Content */}
+                    <motion.div
+                      initial={false}
+                      animate={{ height: expandedId === exp._id ? 'auto' : 0 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="mt-4 pt-4 border-t border-gray-800">
+                        <ul className="space-y-2">
+                          {exp.description.split('\n').map((achievement, i) => (
+                            <motion.li
+                              key={i}
+                              initial={{ opacity: 0, x: -20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: i * 0.1 }}
+                              className="flex items-start space-x-3 group/item"
+                            >
+                              <span className="mt-2 h-1.5 w-1.5 rounded-full bg-accent-gold
+                                group-hover/item:shadow-[0_0_8px_rgba(255,215,0,0.5)]
+                                transition-shadow duration-300" />
+                              <span className="text-secondary-dark group-hover/item:text-secondary-light
+                                transition-colors duration-300 text-sm">
+                                {achievement}
+                              </span>
+                            </motion.li>
+                          ))}
+                        </ul>
 
-                    {/* Technologies */}
-                    <div className="flex flex-wrap gap-2 pt-2">
-                      {exp.technologies?.map((tech) => (
-                        <span
-                          key={tech}
-                          className="px-3 py-1 text-xs font-mono rounded-full
-                            bg-primary-light/10 text-secondary-light border border-accent-gold/20
-                            shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)] group-hover:border-accent-gold/40
-                            transition-colors duration-300"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
+                        {/* Technologies */}
+                        {expandedId === exp._id && exp.technologies?.length > 0 && (
+                          <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="flex flex-wrap gap-2 mt-4"
+                          >
+                            {exp.technologies.map((tech) => (
+                              <span
+                                key={tech}
+                                className="px-2 py-1 text-xs font-mono rounded-full
+                                  bg-primary-light/10 text-secondary-light border border-accent-gold/20
+                                  shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]
+                                  transition-colors duration-300"
+                              >
+                                {tech}
+                              </span>
+                            ))}
+                          </motion.div>
+                        )}
+                      </div>
+                    </motion.div>
                   </div>
                 </motion.div>
               </motion.div>

@@ -28,4 +28,36 @@
       opacity: 0.2;
     }
   }
+
+  @keyframes typing {
+    0% { 
+      width: 0;
+      opacity: 0;
+    }
+    1% {
+      opacity: 1;
+    }
+    100% { 
+      width: 100%;
+      opacity: 1;
+    }
+  }
+
+  @keyframes blink {
+    0%, 100% { border-color: rgba(16, 185, 129, 0.7); }
+    50% { border-color: transparent; }
+  }
+
+  .typing-effect {
+    position: relative;
+    overflow: hidden;
+    border-right: 2px solid rgba(16, 185, 129, 0.7);
+    white-space: pre;
+    margin: 0;
+    letter-spacing: 0.05em;
+    width: 0;
+    animation: 
+      typing 2s ease-in-out forwards,
+      blink 1s ease-in-out infinite;
+  }
 } 

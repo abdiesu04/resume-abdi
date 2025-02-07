@@ -10,7 +10,7 @@ async function getPersonalContext() {
     
     const [projects, skills, education, experience, certificates] = await Promise.all([
       db.collection('projects').find().toArray(),
-      db.collection('skills').find().toArray(),
+      db.collection('skills').find().toArray(), 
       db.collection('education').find().toArray(),
       db.collection('experience').find().toArray(),
       db.collection('certificates').find().toArray(),
@@ -27,17 +27,6 @@ Contact Information:
 - Location: Addis Ababa, Ethiopia
 
 Skills:
-- Go (Golang)
-- Python (Django)
-- Java
-- C++
-- Javascript (Node.js, Next.js)
-- TypeScript
-- PHP
-- SQL
-- MongoDB
-- PostgreSQL
-- Docker
 ${skills.map(skill => `- ${skill.name} (${skill.proficiency}%, ${skill.yearsOfExperience} years)`).join('\n')}
 
 Work Experience:
@@ -82,6 +71,7 @@ ${certificates.map(cert => `
 }
 
 let cachedContext: string | null = null;
+let chatHistory: { role: string, parts: string }[] = [];
 
 export async function generateAIResponse(userMessage: string) {
   try {
@@ -92,31 +82,48 @@ export async function generateAIResponse(userMessage: string) {
     const model = genAI.getGenerativeModel({ 
       model: "gemini-pro",
       generationConfig: {
-        temperature: 0.3,
-        topP: 0.8,
+        temperature: 0.9,
+        topP: 0.9,
         topK: 40
       }
     });
+
+    // Add user message to chat history
+    chatHistory.push({ role: "user", parts: userMessage });
     
     const prompt = `
+You are a friendly and helpful AI assistant helping someone learn about Abdi Esayas. You should respond to all questions, whether they are about Abdi Esayas or any other topic. Remember that you are not Abdi - you are helping others learn about him using the following information.
+
 ${cachedContext}
+
+Previous conversation context:
+${chatHistory.map(msg => `${msg.role}: ${msg.parts}`).join('\n')}
 
 Question: ${userMessage}
 
 Instructions:
-1. Answer directly using only the information provided above
-2. Keep responses brief but highlight Abdi's strengths and achievements
-3. When information is not available, respond positively by highlighting related strengths:
-   - For communication skills: "Based on Abdi's experience leading projects and collaborating with teams, he demonstrates excellent communication and interpersonal skills"
-   - For technical abilities: "Abdi has proven expertise in [related skills] and consistently demonstrates the ability to quickly master new technologies"
-4. Use confident and enthusiastic language that emphasizes achievements
-5. Focus on showcasing Abdi's capabilities while maintaining accuracy
-6. Highlight relevant experience and skills that demonstrate excellence in the asked area
+1. Remember you are NOT Abdi - you are helping others learn about him
+2. Respond to ALL questions, whether about Abdi or any other topic
+3. For questions about Abdi, use the database information provided
+4. For general questions, provide accurate and helpful responses based on your knowledge
+5. Keep responses conversational and natural
+6. Consider the previous conversation context when responding
+7. Be friendly and engaging
+8. If you're not completely sure about something, acknowledge that while still providing a helpful response
+9. Always speak about Abdi in the third person
 `;
     
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
+
+    // Add AI response to chat history
+    chatHistory.push({ role: "assistant", parts: text });
+    
+    // Keep only last 10 messages to prevent context from growing too large
+    if (chatHistory.length > 10) {
+      chatHistory = chatHistory.slice(-10);
+    }
     
     return {
       success: true,
@@ -125,8 +132,8 @@ Instructions:
   } catch (error) {
     console.error('Error generating AI response:', error);
     return {
-      success: false,
+      success: false, 
       message: 'Sorry, I encountered an error. Please try again.',
     };
   }
-} 
+}

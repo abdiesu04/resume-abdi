@@ -86,10 +86,9 @@ export default function Skills() {
         const data = await res.json();
 
         if (data.success && Array.isArray(data.data)) {
-          // Validate and filter visible skills
+          // Validate skills without requiring the visible property
           const validSkills = data.data
             .filter((skill: Skill) => (
-              skill.visible && 
               typeof skill.name === 'string' &&
               typeof skill.category === 'string' &&
               typeof skill.proficiency === 'number' &&
@@ -131,13 +130,16 @@ export default function Skills() {
         className="space-y-4"
       >
         <div className="flex items-center space-x-4">
-          <div className="h-2 w-2 rounded-full bg-accent-gold animate-pulse" />
-          <h2 className="text-2xl font-mono font-bold text-secondary-light">
+          <div className="relative">
+            <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+            <div className="absolute inset-0 h-2 w-2 rounded-full bg-emerald-400/50 animate-ping" />
+          </div>
+          <h2 className="text-2xl font-mono font-bold bg-gradient-to-r from-white via-emerald-200 to-white text-transparent bg-clip-text">
             TECHNICAL EXPERTISE
           </h2>
         </div>
         
-        <div className="h-px bg-gradient-to-r from-accent-gold/50 via-accent-gold to-accent-gold/50" />
+        <div className="h-px bg-gradient-to-r from-emerald-400/0 via-emerald-400/50 to-emerald-400/0" />
       </motion.div>
 
       {error && (
@@ -146,153 +148,106 @@ export default function Skills() {
         </div>
       )}
 
-      <motion.div
-        variants={secureReveal}
-        initial="hidden"
-        animate="visible"
-        className="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-8"
-      >
-        {isLoading ? (
-          // Loading skeletons with neumorphic effect
-          [...Array(3)].map((_, i) => (
-            <div
-              key={i}
-              className="bg-[#0D1627] rounded-xl border border-gray-800 p-8 space-y-6
-                shadow-[inset_0_2px_4px_rgba(255,255,255,0.05),0_4px_8px_rgba(0,0,0,0.4)]
-                backdrop-blur-sm"
-            >
-              <div className="flex items-center space-x-2">
-                <div className="h-1.5 w-1.5 rounded-full bg-emerald-400/20 animate-pulse" />
-                <div className="h-6 w-32 bg-secondary-light/20 rounded-lg animate-pulse" />
-              </div>
-
-              <div className="space-y-4">
-                {[...Array(4)].map((_, j) => (
-                  <div key={j} className="space-y-2">
-                    <div className="flex justify-between">
-                      <div className="h-4 w-24 bg-secondary-light/20 rounded-lg animate-pulse" />
-                      <div className="h-4 w-12 bg-accent-gold/20 rounded-lg animate-pulse" />
-                    </div>
-                    <div className="h-2 bg-primary-light/10 rounded-full">
-                      <div className="h-full bg-accent-gold/20 rounded-full animate-pulse" style={{ width: '60%' }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))
-        ) : (
-          Object.entries(skillsByCategory).map(([category, categorySkills]) => (
-            <motion.div
-              key={category}
-              whileHover={{ 
-                scale: 1.02,
-                boxShadow: '0 8px 16px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.1)'
-              }}
-              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-              className="relative overflow-hidden
-                bg-gradient-to-br from-[#0D1627] to-[#1A2942]
-                rounded-xl border border-gray-800 p-8 space-y-6
-                shadow-[inset_0_2px_4px_rgba(255,255,255,0.05),0_4px_8px_rgba(0,0,0,0.4)]
-                backdrop-blur-sm hover:border-emerald-400/40 transition-all duration-300
-                group"
-            >
-              {/* Glow Effect */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/10 to-transparent" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(52,211,153,0.1),transparent_70%)]" />
-              </div>
-
-              <div className="relative">
+      <div className="mt-12">
+        <motion.div
+          variants={secureReveal}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        >
+          {isLoading ? (
+            // Enhanced loading skeletons in grid
+            [...Array(6)].map((_, i) => (
+              <div
+                key={i}
+                className="bg-gradient-to-br from-[#0D1627] to-[#1A2942] rounded-lg border border-gray-800 p-4 space-y-3
+                  shadow-[inset_0_2px_4px_rgba(255,255,255,0.05),0_4px_8px_rgba(0,0,0,0.4)]
+                  backdrop-blur-sm relative overflow-hidden group"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(16,185,129,0.1),transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                
                 <div className="flex items-center space-x-2">
-                  <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <h3 className="text-lg font-mono font-bold text-secondary-light group-hover:text-emerald-400 transition-colors duration-300">
-                    {category}
-                  </h3>
+                  <div className="h-1 w-1 rounded-full bg-emerald-400/20 animate-pulse" />
+                  <div className="h-4 w-24 bg-emerald-400/20 rounded-lg animate-pulse" />
                 </div>
 
-                <div className="mt-6 space-y-4">
-                  {categorySkills.map((skill) => (
-                    <motion.div
-                      key={skill._id}
-                      className="space-y-2"
-                      whileHover={{ x: 4 }}
-                      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                    >
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-mono text-secondary-light group-hover:text-emerald-400/90 transition-colors duration-300">
-                          {skill.name}
-                        </span>
-                        <div className="flex items-center space-x-2">
-                          <span className="text-xs font-mono text-emerald-400 px-2 py-1 rounded-full bg-emerald-400/10
-                            shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]">
-                            {skill.yearsOfExperience}+ YRS
-                          </span>
-                        </div>
+                <div className="space-y-3">
+                  {[...Array(3)].map((_, j) => (
+                    <div key={j} className="space-y-2">
+                      <div className="flex justify-between">
+                        <div className="h-3 w-20 bg-emerald-400/20 rounded-lg animate-pulse" />
+                        <div className="h-3 w-8 bg-emerald-400/20 rounded-lg animate-pulse" />
                       </div>
-                      <div className="h-2 bg-[#1E2D4A] rounded-full overflow-hidden
-                        shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
-                        <motion.div
-                          className="h-full bg-gradient-to-r from-emerald-400/80 to-emerald-400
-                            shadow-[0_0_8px_rgba(52,211,153,0.3)]"
-                          initial={{ width: 0 }}
-                          animate={{ width: `${skill.proficiency}%` }}
-                          transition={{ duration: 1, ease: 'easeOut' }}
-                        />
+                      <div className="h-1.5 bg-[#1E2D4A] rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-emerald-400/20 to-emerald-400/40 animate-pulse" 
+                          style={{ width: '60%' }} />
                       </div>
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
               </div>
-            </motion.div>
-          ))
-        )}
-      </motion.div>
+            ))
+          ) : (
+            Object.entries(skillsByCategory).map(([category, categorySkills]) => (
+              <motion.div
+                key={category}
+                className="relative overflow-hidden
+                  bg-gradient-to-br from-[#0D1627] to-[#1A2942]
+                  rounded-lg border border-gray-800 p-4
+                  shadow-[inset_0_2px_4px_rgba(255,255,255,0.05),0_4px_8px_rgba(0,0,0,0.4)]
+                  backdrop-blur-sm border-emerald-400/20 transition-all duration-500
+                  group min-h-[180px]"
+              >
+                {/* Subtle Glow Effect */}
+                <div className="absolute inset-0">
+                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/5 to-transparent" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(16,185,129,0.05),transparent_70%)]" />
+                </div>
 
-      {/* Certifications with neumorphic effect */}
-      <motion.div
-        variants={secureReveal}
-        initial="hidden"
-        animate="visible"
-        className="mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
-      >
-        {['SYSTEM ARCHITECTURE', 'SECURE CODING', 'OPTIMIZATION', 'DEPLOYMENT'].map((cert) => (
-          <motion.div
-            key={cert}
-            whileHover={{ 
-              scale: 1.05,
-              boxShadow: '0 8px 16px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.1)'
-            }}
-            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-            className="relative overflow-hidden
-              bg-gradient-to-br from-[#0D1627] to-[#1A2942]
-              rounded-xl border border-gray-800 p-4
-              shadow-[inset_0_2px_4px_rgba(255,255,255,0.05),0_4px_8px_rgba(0,0,0,0.4)]
-              backdrop-blur-sm hover:border-accent-gold/40 transition-all duration-300
-              group"
-          >
-            {/* Glow Effect */}
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <div className="absolute inset-0 bg-gradient-to-br from-accent-gold/10 to-transparent" />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,215,0,0.1),transparent_70%)]" />
-            </div>
+                <div className="relative">
+                  <div className="flex items-center space-x-2 mb-3">
+                    <div className="h-1 w-1 rounded-full bg-emerald-400" />
+                    <h3 className="text-xs font-mono font-bold text-emerald-400/90">
+                      {category}
+                    </h3>
+                  </div>
 
-            <div className="relative">
-              <div className="flex items-center space-x-2">
-                <div className="h-1.5 w-1.5 rounded-full bg-accent-gold animate-pulse" />
-                <span className="text-xs font-mono text-accent-gold px-2 py-1 rounded-full bg-accent-gold/10
-                  shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]">
-                  CERTIFIED
-                </span>
-              </div>
-              <div className="mt-2 text-sm font-mono text-secondary-light group-hover:text-accent-gold
-                transition-colors duration-300">
-                {cert}
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </motion.div>
+                  <div className="space-y-2">
+                    {categorySkills.map((skill) => (
+                      <div
+                        key={skill._id}
+                        className="space-y-1.5"
+                      >
+                        <div className="flex justify-between items-center">
+                          <span className="text-[11px] font-mono text-secondary-light">
+                            {skill.name}
+                          </span>
+                          <span className="text-[9px] font-mono text-emerald-400/90 px-1 py-0.5 rounded-full 
+                            bg-emerald-400/10 border border-emerald-400/20
+                            shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]">
+                            {skill.yearsOfExperience}y
+                          </span>
+                        </div>
+                        <div className="h-1 bg-[#1E2D4A] rounded-full overflow-hidden relative
+                          shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
+                          <motion.div
+                            className="absolute inset-y-0 left-0 bg-gradient-to-r from-emerald-400/80 via-emerald-400 to-emerald-400/80
+                              shadow-[0_0_8px_rgba(52,211,153,0.3)]"
+                            initial={{ width: 0 }}
+                            animate={{ width: `${skill.proficiency}%` }}
+                            transition={{ duration: 1, ease: 'easeOut' }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            ))
+          )}
+        </motion.div>
+      </div>
     </section>
   );
 }
