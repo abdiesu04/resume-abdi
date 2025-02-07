@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #020C1B;
+    --foreground: #CCD6F6;
+  }
+
+  body {
+    @apply bg-background-darker text-secondary-light antialiased;
+  }
+}
+
+@layer utilities {
+  .animate-secure-scan {
+    animation: secure-scan 2s ease-in-out infinite;
+  }
+
+  @keyframes secure-scan {
+    0%, 100% {
+      transform: translateY(0);
+      opacity: 0.05;
+    }
+    50% {
+      transform: translateY(100%);
+      opacity: 0.2;
+    }
+  }
+} 
