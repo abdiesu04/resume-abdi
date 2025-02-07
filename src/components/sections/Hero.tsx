@@ -28,11 +28,7 @@ const socialLinks = [
 
 const technologies = ['Go', 'TypeScript', 'Node.js', 'PostgreSQL', 'MongoDB'];
 
-// Dynamically import the MicroservicesScene with no SSR
-const MicroservicesScene = dynamic(
-  () => import('../3d/MicroservicesScene'),
-  { ssr: false }
-);
+
 
 const CodeRain = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
