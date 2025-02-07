@@ -8,8 +8,8 @@ export default function ExperienceForm() {
     title: '',
     company: '',
     location: '',
-    startDate: '',
-    endDate: '',
+    startDate: new Date(),
+    endDate: new Date(),
     description: '',
     technologies: [],
   });
@@ -58,8 +58,8 @@ export default function ExperienceForm() {
           title: '',
           company: '',
           location: '',
-          startDate: '',
-          endDate: '',
+          startDate: new Date(),
+          endDate: new Date(),
           description: '',
           technologies: [],
         });
@@ -161,8 +161,8 @@ export default function ExperienceForm() {
               </label>
               <input
                 type="date"
-                value={formData.startDate}
-                onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                value={formData.startDate?.toISOString().split('T')[0]}
+                onChange={(e) => setFormData({ ...formData, startDate: new Date(e.target.value) })}
                 className="w-full px-4 py-2 rounded-md bg-[#1E2D4A] border border-gray-700 text-white focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400"
                 required
               />
@@ -174,8 +174,8 @@ export default function ExperienceForm() {
               </label>
               <input
                 type="date"
-                value={formData.endDate}
-                onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                value={formData.endDate?.toISOString().split('T')[0]}
+                onChange={(e) => setFormData({ ...formData, endDate: new Date(e.target.value) })}
                 className="w-full px-4 py-2 rounded-md bg-[#1E2D4A] border border-gray-700 text-white focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400"
               />
             </div>
@@ -275,7 +275,7 @@ export default function ExperienceForm() {
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
-                    onClick={() => setDeleteModal({ isOpen: true, experienceId: exp._id })}
+                    onClick={() => setDeleteModal({ isOpen: true, experienceId: exp._id || null })}
                     className="text-red-400 hover:text-red-500 transition-colors"
                   >
                     <svg

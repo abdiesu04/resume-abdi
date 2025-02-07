@@ -241,7 +241,7 @@ export default function SkillForm() {
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
-                    onClick={() => setDeleteModal({ isOpen: true, skillId: skill._id })}
+                    onClick={() => setDeleteModal({ isOpen: true, skillId: skill._id || null })}
                     className="text-red-400 hover:text-red-500 transition-colors"
                   >
                     <svg

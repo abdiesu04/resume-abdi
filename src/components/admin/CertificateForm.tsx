@@ -13,7 +13,7 @@ export default function CertificateForm() {
     issuer: '',
     date: '',
     credentialUrl: '',
-    imageUrl: '',
+    imageUrl: '', 
     visible: true,
   });
 
@@ -72,7 +72,8 @@ export default function CertificateForm() {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: string | undefined) => {
+    if (!id) return;
     if (!window.confirm('Are you sure you want to delete this certificate?')) return;
 
     try {
@@ -94,7 +95,8 @@ export default function CertificateForm() {
     }
   };
 
-  const handleVisibilityToggle = async (id: string, currentVisibility: boolean) => {
+  const handleVisibilityToggle = async (id: string | undefined, currentVisibility: boolean) => {
+    if (!id) return;
     try {
       const response = await fetch(`/api/certificates/${id}`, {
         method: 'PATCH',
