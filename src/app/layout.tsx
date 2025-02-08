@@ -31,34 +31,36 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`min-h-screen bg-background-darker font-sans antialiased flex flex-col ${inter.variable} ${jetbrainsMono.variable}`}>
-        <Toaster 
-          position="top-right"
-          toastOptions={{
-            duration: 3000,
-            style: {
-              background: '#1E2D4A',
-              color: '#fff',
-              border: '1px solid #374151',
-            },
-            success: {
-              iconTheme: {
-                primary: '#10B981',
-                secondary: '#fff',
+        <div className="flex flex-col min-h-screen w-full overflow-x-hidden">
+          <Toaster 
+            position="top-right"
+            toastOptions={{
+              duration: 3000,
+              style: {
+                background: '#1E2D4A',
+                color: '#fff',
+                border: '1px solid #374151',
               },
-            },
-            error: {
-              iconTheme: {
-                primary: '#EF4444',
-                secondary: '#fff',
+              success: {
+                iconTheme: {
+                  primary: '#10B981',
+                  secondary: '#fff',
+                },
               },
-            },
-          }}
-        />
-        <main className="flex-grow">
-          {children}
-        </main>
-        <Footer />
-        <Chat />
+              error: {
+                iconTheme: {
+                  primary: '#EF4444',
+                  secondary: '#fff',
+                },
+              },
+            }}
+          />
+          <main className="flex-grow w-full">
+            {children}
+          </main>
+          <Footer />
+          <Chat />
+        </div>
       </body>
     </html>
   );

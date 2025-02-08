@@ -45,99 +45,173 @@ const socialLinks = [
   }
 ];
 
-function ParticlesEffect() {
-  const [particles, setParticles] = useState<Array<{ x: number; y: number; duration: number }>>([]);
+// Code particles animation
+function CodeParticles() {
+  const [particles, setParticles] = useState<Array<{
+    id: number;
+    x: number;
+    y: number;
+    size: number;
+    speed: number;
+    symbol: string;
+  }>>([]);
+
+  const codeSymbols = ['{ }', '( )', '< >', '=>', '[];', '&&', '||', '++', '//'];
 
   useEffect(() => {
-    const newParticles = [...Array(20)].map(() => ({
+    const generateParticle = () => ({
+      id: Math.random(),
       x: Math.random() * 100,
-      y: Math.random() * 100,
-      duration: Math.random() * 10 + 20
-    }));
-    setParticles(newParticles);
+      y: -10,
+      size: Math.random() * 14 + 8,
+      speed: Math.random() * 1.5 + 0.5,
+      symbol: codeSymbols[Math.floor(Math.random() * codeSymbols.length)]
+    });
+
+    const interval = setInterval(() => {
+      setParticles(prev => {
+        const filtered = prev.filter(p => p.y < 110);
+        return [...filtered, generateParticle()].map(p => ({
+          ...p,
+          y: p.y + p.speed
+        }));
+      });
+    }, 200);
+
+    return () => clearInterval(interval);
   }, []);
 
   return (
     <div className="absolute inset-0">
-      {particles.map((particle, i) => (
+      {particles.map(particle => (
         <motion.div
-          key={i}
-          className="absolute w-1 h-1 bg-emerald-400/30 rounded-full"
-          initial={{ 
-            x: `${particle.x}%`,
-            y: `${particle.y}%`
+          key={particle.id}
+          className="absolute font-mono text-emerald-500/20"
+          style={{
+            fontSize: particle.size,
+            left: `${particle.x}%`,
+            top: `${particle.y}%`,
           }}
-          animate={{
-            y: ["-10%", "110%"],
-            x: ["-10%", "110%"]
-          }}
-          transition={{
-            duration: particle.duration,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-        />
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 0.8, scale: 1 }}
+          exit={{ opacity: 0, scale: 0 }}
+        >
+          {particle.symbol}
+        </motion.div>
       ))}
+    </div>
+  );
+}
+
+// Neural network visualization
+function NeuralNetwork() {
+  return (
+    <div className="absolute inset-0">
+      <div className="grid grid-cols-5 gap-8 p-8 opacity-20">
+        {[...Array(25)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="aspect-square rounded-full bg-gradient-to-r from-emerald-400 to-blue-500"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.6, 0.3],
+            }}
+            transition={{
+              duration: 3,
+              delay: i * 0.1,
+              repeat: Infinity,
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Matrix rain effect
+function MatrixRain() {
+  return (
+    <div className="absolute inset-0">
+      <div className="grid grid-cols-12 gap-1 opacity-10">
+        {[...Array(48)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="h-screen overflow-hidden font-mono text-xs text-emerald-500"
+            initial={{ y: -1000 }}
+            animate={{ y: 1000 }}
+            transition={{
+              duration: Math.random() * 10 + 5,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+          >
+            {[...Array(30)].map((_, j) => (
+              <div key={j}>
+                {Math.random().toString(36).substring(2, 3)}
+              </div>
+            ))}
+          </motion.div>
+        ))}
+      </div>
     </div>
   );
 }
 
 export default function Hero() {
   const [mounted, setMounted] = useState(false);
-  const [currentQuote, setCurrentQuote] = useState(0);
+  const [currentMetric, setCurrentMetric] = useState(0);
 
-  const engineeringQuotes = [
-    "Clean code always looks like it was written by someone who cares.",
-    "Simplicity is the ultimate sophistication in software design.",
-    "Programming isn't about what you know; it's about what you can figure out."
+  const engineeringMetrics = [
+    "Full Stack Developer",
+    "Problem Solving Expert",
+    "Innovation Engineer",
+    "Tech Enthusiast"
   ];
 
   useEffect(() => {
     setMounted(true);
     const interval = setInterval(() => {
-      setCurrentQuote((prev) => (prev + 1) % engineeringQuotes.length);
-    }, 15000);
+      setCurrentMetric((prev) => (prev + 1) % engineeringMetrics.length);
+    }, 3000);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="min-h-[80vh] flex flex-col lg:flex-row items-center justify-center px-4 py-8 lg:py-0 relative overflow-hidden">
-      {/* Magical Background Effects */}
-      <div className="absolute inset-0 bg-[#0A1120]">
+    <div className="w-full min-h-[90vh] md:min-h-[80vh] flex flex-col lg:flex-row items-center justify-center px-4 sm:px-6 lg:px-8 py-12 lg:py-0 relative overflow-hidden">
+      {/* Enhanced Background - Hidden on mobile */}
+      <div className="absolute inset-0 bg-[#0A1120] hidden md:block">
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-transparent to-blue-500/10" />
-        <motion.div
-          animate={{
-            backgroundPosition: ['0% 0%', '100% 100%'],
-            opacity: [0.1, 0.3, 0.1]
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            repeatType: 'reverse'
-          }}
-          className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(16,185,129,0.1)_0%,_transparent_50%)]"
-        />
-        {/* Only render particles after mounting */}
-        {mounted && <ParticlesEffect />}
+        {mounted && (
+          <>
+            <CodeParticles />
+            <NeuralNetwork />
+            <MatrixRain />
+          </>
+        )}
+      </div>
+
+      {/* Mobile Background */}
+      <div className="absolute inset-0 bg-[#0A1120] md:hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-blue-500/5" />
       </div>
 
       {/* Left Side - Introduction */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="lg:w-1/2 space-y-6 text-center lg:text-left z-10"
+        className="w-full lg:w-1/2 space-y-6 text-center lg:text-left z-10 px-4 sm:px-6 lg:px-8"
       >
         <motion.div 
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-400/10 text-emerald-400 text-sm border border-emerald-400/20 hover:bg-emerald-400/20 transition-colors"
+          className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-400/10 text-emerald-400 text-sm border border-emerald-400/20"
         >
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
           </span>
-          <span className="font-mono">Available for opportunities</span>
+          <span className="font-mono">READY TO CODE</span>
         </motion.div>
 
         <div className="space-y-2">
@@ -145,18 +219,13 @@ export default function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="text-4xl sm:text-5xl lg:text-6xl font-bold"
+            className="text-3xl sm:text-4xl lg:text-6xl font-bold"
           >
-            <span className="block text-white relative group">
+            <span className="block text-white">
               ABDI ESAYAS
-              <motion.span
-                className="absolute -inset-1 bg-gradient-to-r from-emerald-400/20 to-blue-500/20 blur-lg group-hover:opacity-100"
-                animate={{ opacity: [0.5, 0.8, 0.5] }}
-                transition={{ duration: 3, repeat: Infinity }}
-              />
             </span>
             <motion.span 
-              className="block mt-2 bg-gradient-to-r from-emerald-400 to-blue-500 bg-clip-text text-transparent"
+              className="block mt-2 bg-gradient-to-r from-emerald-400 via-purple-500 to-blue-500 bg-clip-text text-transparent"
               animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
               transition={{ duration: 5, repeat: Infinity }}
               style={{ backgroundSize: '200% auto' }}
@@ -170,11 +239,28 @@ export default function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="text-lg text-gray-400 max-w-2xl mx-auto lg:mx-0"
+          className="text-base sm:text-lg text-gray-400 max-w-md mx-auto lg:mx-0"
         >
-          Crafting elegant solutions through code. 
-          Passionate about building scalable systems and creating exceptional software experiences.
+          Transforming ideas into reality through innovative code and cutting-edge solutions.
         </motion.p>
+
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="font-mono text-sm text-emerald-400"
+        >
+          <AnimatePresence mode='wait'>
+            <motion.div
+              key={currentMetric}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              {engineeringMetrics[currentMetric]}
+            </motion.div>
+          </AnimatePresence>
+        </motion.div>
 
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -182,72 +268,60 @@ export default function Hero() {
           transition={{ delay: 0.6 }}
           className="flex flex-col gap-6"
         >
-          {/* Contact Information */}
-          <div className="flex flex-col gap-4">
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.7 }}
-              className="flex flex-wrap gap-4 justify-center lg:justify-start"
-            >
-              {socialLinks.map((link, index) => (
-                <motion.a
-                  key={link.name}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#1E2D4A] text-gray-300 hover:text-emerald-400 hover:bg-[#1E2D4A]/80 transition-all group"
-                  whileHover={{ scale: 1.05, x: 5 }}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.8 + index * 0.1 }}
-                >
-                  <span className="text-emerald-400 group-hover:text-emerald-300 transition-colors">
-                    {link.icon}
-                  </span>
-                  <span className="text-sm font-mono">{link.name}</span>
-                </motion.a>
-              ))}
-            </motion.div>
+          <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
+            {socialLinks.map((link, index) => (
+              <motion.a
+                key={link.name}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#1E2D4A] text-gray-300 hover:text-emerald-400 hover:bg-[#1E2D4A]/80 transition-all border border-emerald-500/20"
+                whileHover={{ scale: 1.05 }}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.8 + index * 0.1 }}
+              >
+                <span className="text-emerald-400">
+                  {link.icon}
+                </span>
+                <span className="text-sm font-mono">{link.name}</span>
+              </motion.a>
+            ))}
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-4 justify-center lg:justify-start">
+          <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
             <Link href="#projects">
-              <Button variant="default" size="lg" className="group">
-                <span>View Projects</span>
+              <Button variant="default" size="lg" className="group relative overflow-hidden font-mono text-sm sm:text-base">
                 <motion.span
-                  className="ml-2 inline-block"
-                  animate={{ x: [0, 4, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                >
-                  →
-                </motion.span>
+                  className="absolute inset-0 bg-gradient-to-r from-emerald-400/20 to-blue-500/20"
+                  animate={{
+                    x: ['-100%', '100%'],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: 'linear',
+                  }}
+                />
+                <span className="relative">VIEW_PROJECTS</span>
               </Button>
             </Link>
             <a href="https://flowcv.com/resume/feswa5vi0s" target="_blank" rel="noopener noreferrer">
-              <Button variant="outline" size="lg" className="group">
-                <span>View Resume</span>
-                <motion.span
-                  className="ml-2 inline-block opacity-0 group-hover:opacity-100"
-                  animate={{ y: [0, -2, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                >
-                  ↗
-                </motion.span>
+              <Button variant="outline" size="lg" className="group font-mono text-sm sm:text-base">
+                <span>DOWNLOAD_CV</span>
               </Button>
             </a>
           </div>
         </motion.div>
       </motion.div>
 
-      {/* Right Side - Code Preview */}
+      {/* Right Side - Code Preview - Hidden on mobile */}
       {mounted && (
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
-          className="hidden lg:block lg:w-1/2 mt-12 lg:mt-0 z-10 w-full px-4 lg:px-0"
+          className="hidden lg:block w-full lg:w-1/2 mt-12 lg:mt-0 z-10 px-4 sm:px-6 lg:px-8"
         >
           <CodePreview />
         </motion.div>
@@ -258,40 +332,37 @@ export default function Hero() {
 
 function CodePreview() {
   const [currentLine, setCurrentLine] = useState(0);
-  const [isTypingComplete, setIsTypingComplete] = useState(false);
 
   const codeLines = [
-    { type: 'keyword', content: 'class' },
-    { type: 'class', content: 'SoftwareEngineer' },
-    { type: 'keyword', content: 'implements' },
-    { type: 'interface', content: 'Developer' },
-    { type: 'punctuation', content: '{' },
-    { type: 'property', content: '  skills: string[]' },
-    { type: 'property', content: '  passion: number // Level 100' },
-    { type: 'method', content: '  solveProblems() {' },
-    { type: 'comment', content: '    // Transform complex challenges into' },
-    { type: 'comment', content: '    // elegant solutions' },
-    { type: 'code', content: '    return innovation.create({' },
-    { type: 'code', content: '      quality: "exceptional",' },
-    { type: 'code', content: '      scalable: true,' },
-    { type: 'code', content: '      maintainable: true' },
-    { type: 'code', content: '    });' },
+    { type: 'comment', content: '// Engineering Innovation Hub' },
+    { type: 'class', content: 'class SoftwareEngineer {' },
+    { type: 'property', content: '  private readonly techStack: string[]' },
+    { type: 'property', content: '  private readonly passion: Innovation' },
+    { type: 'method', content: '  async createSolution() {' },
+    { type: 'code', content: '    const project = await this.develop({' },
+    { type: 'code', content: '      technologies: ["React", "Node", "AI"],' },
+    { type: 'code', content: '      approach: {' },
+    { type: 'code', content: '        innovative: true,' },
+    { type: 'code', content: '        efficient: true,' },
+    { type: 'code', content: '        futureProof: true' },
+    { type: 'code', content: '      }' },
+    { type: 'code', content: '    })' },
+    { type: 'method', content: '  }' },
+    { type: 'method', content: '  enhancePerformance() {' },
+    { type: 'code', content: '    return this.innovate()' },
+    { type: 'code', content: '      .then(this.optimize)' },
+    { type: 'code', content: '      .then(this.validate)' },
+    { type: 'code', content: '      .then(this.ship)' },
     { type: 'method', content: '  }' },
     { type: 'punctuation', content: '}' }
   ];
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentLine(prev => {
-        if (prev < codeLines.length - 1) {
-          return prev + 1;
-        } else {
-          setIsTypingComplete(true);
-          clearInterval(interval);
-          return prev;
-        }
-      });
-    }, 200);
+      setCurrentLine(prev => 
+        prev < codeLines.length - 1 ? prev + 1 : prev
+      );
+    }, 150);
 
     return () => clearInterval(interval);
   }, []);
@@ -299,14 +370,14 @@ function CodePreview() {
   return (
     <div className="relative">
       <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/10 to-blue-500/10 rounded-lg filter blur-3xl" />
-      <div className="relative bg-[#0D1627] rounded-lg border border-[#1E2D4A] overflow-hidden shadow-2xl hover:border-emerald-400/50 transition-colors duration-300">
-        <div className="flex items-center justify-between px-4 py-2 bg-[#1E2D4A]/50">
+      <div className="relative bg-[#0D1627] rounded-lg border border-emerald-500/20 overflow-hidden shadow-2xl">
+        <div className="flex items-center justify-between px-4 py-2 bg-[#1E2D4A]/50 border-b border-emerald-500/20">
           <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 rounded-full bg-red-400" />
-            <div className="w-3 h-3 rounded-full bg-yellow-400" />
-            <div className="w-3 h-3 rounded-full bg-green-400" />
+            <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
+            <div className="w-3 h-3 rounded-full bg-blue-500/80" />
+            <div className="w-3 h-3 rounded-full bg-purple-500/80" />
           </div>
-          <span className="text-xs font-mono text-gray-400">engineer.ts</span>
+          <span className="text-xs font-mono text-emerald-400">engineer.ts</span>
         </div>
         <div className="p-4">
           <pre className="text-sm font-mono">
@@ -318,12 +389,10 @@ function CodePreview() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.3 }}
                   className={`whitespace-pre ${
-                    line.type === 'keyword' ? 'text-purple-400' :
-                    line.type === 'class' ? 'text-yellow-400' :
-                    line.type === 'interface' ? 'text-blue-400' :
-                    line.type === 'property' ? 'text-emerald-400' :
-                    line.type === 'method' ? 'text-blue-400' :
                     line.type === 'comment' ? 'text-gray-500' :
+                    line.type === 'class' ? 'text-emerald-400' :
+                    line.type === 'property' ? 'text-purple-400' :
+                    line.type === 'method' ? 'text-blue-400' :
                     line.type === 'code' ? 'text-gray-300' :
                     'text-gray-300'
                   }`}
@@ -331,17 +400,15 @@ function CodePreview() {
                   {line.content}
                 </motion.div>
               ))}
-              {!isTypingComplete && (
-                <motion.span
-                  animate={{ opacity: [1, 0] }}
-                  transition={{ duration: 0.8, repeat: Infinity }}
-                  className="inline-block w-2 h-4 bg-emerald-400/50 ml-1"
-                />
-              )}
+              <motion.span
+                animate={{ opacity: [1, 0] }}
+                transition={{ duration: 0.8, repeat: Infinity }}
+                className="inline-block w-2 h-4 bg-emerald-400/50 ml-1"
+              />
             </code>
           </pre>
         </div>
       </div>
     </div>
   );
-} 
+}
