@@ -18,6 +18,8 @@ export interface Certificate {
   date: Date;
   imageUrl?: string;
   verificationUrl?: string;
+  description?: string;
+  skills?: string[];
   visible: boolean;
   createdAt: Date;
 }

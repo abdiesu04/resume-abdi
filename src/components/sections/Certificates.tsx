@@ -31,6 +31,29 @@ export default function Certificates() {
     fetchCertificates();
   }, []);
 
+  const handleVisibilityToggle = async (currentVisibility: boolean, id: string) => {
+    try {
+      const response = await fetch(`/api/certificates/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ visible: !currentVisibility }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setCertificates(prevCerts =>
+          prevCerts.map(cert =>
+            cert._id === id ? { ...cert, visible: !currentVisibility } : cert
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Failed to toggle certificate visibility:', error);
+    }
+  };
+
   const handleCertificateClick = (imageUrl: string) => {
     if (imageUrl) {
       window.open(imageUrl, '_blank', 'noopener,noreferrer');
@@ -68,11 +91,11 @@ export default function Certificates() {
         ) : (
           certificates.map((cert, index) => (
             <motion.div
-              key={cert._id}
+              key={cert._id || index}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              onClick={() => handleCertificateClick(cert.imageUrl || '')}
+              onClick={() => cert.imageUrl && handleCertificateClick(cert.imageUrl)}
               whileHover={{ 
                 scale: 1.02,
                 boxShadow: '0 8px 16px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.1)'
@@ -138,7 +161,7 @@ export default function Certificates() {
 
                 {cert.skills && cert.skills.length > 0 && (
                   <div className="mt-4 flex flex-wrap gap-2">
-                    {cert.skills.map((skill, i) => (
+                    {cert.skills.map((skill: string, i: number) => (
                       <span
                         key={i}
                         className="px-2 py-1 text-xs font-mono rounded-full
@@ -178,6 +201,22 @@ export default function Certificates() {
                       />
                     </svg>
                   </a>
+                )}
+
+                {cert._id && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleVisibilityToggle(cert.visible, cert._id!);
+                    }}
+                    className={`mt-4 px-3 py-1 text-xs font-mono rounded-full
+                      ${cert.visible 
+                        ? 'bg-emerald-400/10 text-emerald-400 hover:bg-emerald-400/20' 
+                        : 'bg-gray-700/10 text-gray-400 hover:bg-gray-700/20'}
+                      transition-colors duration-300`}
+                  >
+                    {cert.visible ? 'Visible' : 'Hidden'}
+                  </button>
                 )}
               </div>
             </motion.div>
