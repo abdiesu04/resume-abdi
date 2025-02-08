@@ -1,3 +1,5 @@
+'use client';
+
 import { motion } from 'framer-motion';
 import { secureReveal } from '@/utils/animations';
 import { useEffect, useState } from 'react';
@@ -92,12 +94,14 @@ export default function Skills() {
             .filter((skill: any) => (
               typeof skill.name === 'string' &&
               typeof skill.category === 'string' &&
-              typeof skill.proficiency === 'number' &&
-              typeof skill.yearsOfExperience === 'number' &&
+              (typeof skill.proficiency === 'number' || typeof skill.proficiency === 'string') &&
+              (typeof skill.yearsOfExperience === 'number' || typeof skill.yearsOfExperience === 'string') &&
               typeof skill._id === 'string'
             ))
             .map((skill: any) => ({
               ...skill,
+              proficiency: Math.min(Math.max(0, Number(skill.proficiency) || 0), 100),
+              yearsOfExperience: Math.max(0, Number(skill.yearsOfExperience) || 0),
               visible: skill.visible ?? true
             }));
 
@@ -197,9 +201,9 @@ export default function Skills() {
                     <div className="flex justify-between items-center text-xs">
                       <span className="text-emerald-400/60">{skill.category}</span>
                       <div className="flex items-center space-x-3">
-                        <span className="text-emerald-400">{skill.proficiency}%</span>
+                        <span className="text-emerald-400">{Math.round(skill.proficiency)}%</span>
                         <span className="text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded">
-                          {skill.yearsOfExperience}Y EXP
+                          {Math.round(skill.yearsOfExperience)}Y EXP
                         </span>
                       </div>
                     </div>

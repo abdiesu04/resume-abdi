@@ -1,19 +1,47 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { Skill } from '@/lib/models';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const client = await clientPromise;
-    const db = client.db('portfolio');
+    if (!request.headers.get('content-type')?.includes('application/json')) {
+      return NextResponse.json(
+        { success: false, error: 'Content type must be application/json' },
+        { status: 415 }
+      );
+    }
+
     const data = await request.json();
 
-    const result = await db.collection('skills').insertOne({
-      ...data,
-      createdAt: new Date(),
-    });
+    // Validate required fields
+    if (!data.name || !data.category || typeof data.proficiency !== 'number' || typeof data.yearsOfExperience !== 'number') {
+      return NextResponse.json(
+        { success: false, error: 'Missing or invalid required fields' },
+        { status: 400 }
+      );
+    }
 
-    return NextResponse.json({ success: true, data: result });
+    // Ensure numeric values are within valid ranges
+    const proficiency = Math.min(Math.max(0, Number(data.proficiency)), 100);
+    const yearsOfExperience = Math.max(0, Number(data.yearsOfExperience));
+
+    const skill: Partial<Skill> = {
+      name: data.name,
+      category: data.category,
+      proficiency,
+      yearsOfExperience,
+      visible: true,
+      createdAt: new Date()
+    };
+
+    const client = await clientPromise;
+    const db = client.db('portfolio');
+    const result = await db.collection('skills').insertOne(skill);
+
+    return NextResponse.json({
+      success: true,
+      data: { ...skill, _id: result.insertedId }
+    });
   } catch (error) {
     console.error('Error in POST /api/skills:', error);
     return NextResponse.json(
@@ -34,7 +62,14 @@ export async function GET() {
       .sort({ category: 1, proficiency: -1 })
       .toArray();
 
-    return NextResponse.json({ success: true, data: skills });
+    // Ensure all numeric values are properly formatted
+    const formattedSkills = skills.map(skill => ({
+      ...skill,
+      proficiency: Math.min(Math.max(0, Number(skill.proficiency) || 0), 100),
+      yearsOfExperience: Math.max(0, Number(skill.yearsOfExperience) || 0)
+    }));
+
+    return NextResponse.json({ success: true, data: formattedSkills });
   } catch (error) {
     console.error('Error in GET /api/skills:', error);
     return NextResponse.json(

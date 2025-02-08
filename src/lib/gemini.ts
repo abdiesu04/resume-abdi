@@ -24,6 +24,19 @@ About Abdi:
 - LinkedIn: linkedin.com/in/abdiesu04
 - Location: Addis Ababa, Ethiopia
 
+Biography:
+Abdi Esayas was born in Ambo, Ethiopia. From an early age, he exhibited a deep curiosity for technology and problem-solving, which later guided his academic and professional journey. He is currently pursuing his Bachelor's degree in Software Engineering at Adama Science and Technology University (ASTU), where he actively engages in software development, research, and competitive programming.
+
+Education and Technical Expertise:
+Abdi has a strong foundation in full-stack development, with a particular focus on backend engineering. He has expertise in Golang, Node.js, FastAPI, and Django, utilizing these technologies to develop scalable, high-performance applications. On the frontend, he is proficient in React and Next.js, ensuring seamless user experiences.
+
+Key Projects:
+- AI-Powered Addiction Recovery Chatbot – Developed using LangChain and GPT-3.5, improving response relevance by 40% over generic models
+- Task Management System (Go & MongoDB) – Engineered a clean architecture-based task management API
+- Loan Tracker API – Built a financial tracking system using Golang, Gin, and MongoDB
+- Restaurant ERP System – Developed backend infrastructure for restaurant management
+- Led Competitive Programming division at CSEC ASTU
+
 Skills:
 ${skills.map(s => `- ${s.name} (${s.proficiency}%, ${s.yearsOfExperience}y)`).join('\n')}
 
@@ -37,7 +50,10 @@ Projects:
 ${projects.map(p => `• ${p.title} - ${p.description}`).join('\n')}
 
 Certificates:
-${certificates.map(c => `• ${c.title} from ${c.issuer}`).join('\n')}`;
+${certificates.map(c => `• ${c.title} from ${c.issuer}`).join('\n')}
+
+Vision:
+Abdi is deeply passionate about building scalable, high-performance systems that serve a large user base. He is particularly interested in backend optimization, API design, and distributed systems. His goal is to secure an internship at a leading tech company, with a long-term vision of working at Google as a software engineer.`;
 
     return context;
   } catch (error) {
