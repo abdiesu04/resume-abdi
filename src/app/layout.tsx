@@ -29,8 +29,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
-      <body className="min-h-screen bg-background-darker font-sans antialiased flex flex-col">
+    <html lang="en" suppressHydrationWarning>
+      <body className={`min-h-screen bg-background-darker font-sans antialiased flex flex-col ${inter.variable} ${jetbrainsMono.variable}`}>
         <Toaster 
           position="top-right"
           toastOptions={{
