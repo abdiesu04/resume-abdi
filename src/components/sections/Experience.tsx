@@ -44,22 +44,43 @@ const fallbackExperience: ExperienceType[] = [
 export default function Experience() {
   const [experiences, setExperiences] = useState<ExperienceType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchExperience = async () => {
       try {
+        setIsLoading(true);
+        setError(null);
+        
         const res = await fetch('/api/experience');
         const data = await res.json();
-        if (data.success) {
-          // Only show visible experience entries
-          setExperiences(data.data.filter((exp: ExperienceType) => exp.visible));
+        
+        if (data.success && Array.isArray(data.data)) {
+          // Transform and validate the data
+          const validExperiences = data.data
+            .filter((exp: any) => (
+              exp.company &&
+              (exp.title || exp.position) &&
+              exp.location &&
+              exp.startDate &&
+              exp.description &&
+              Array.isArray(exp.technologies)
+            ))
+            .map((exp: any) => ({
+              ...exp,
+              position: exp.title || exp.position, // Use title if position is not available
+              visible: exp.visible ?? true, // Set visible to true if missing
+              achievements: exp.achievements || exp.description.split('\n'), // Use description as achievements if missing
+            }));
+
+          setExperiences(validExperiences);
         } else {
-          // Use fallback data if API fails
+          console.warn('Using fallback experience data');
           setExperiences(fallbackExperience);
         }
       } catch (error) {
         console.error('Failed to fetch experience:', error);
-        // Use fallback data if API fails
+        setError('Failed to load experience data');
         setExperiences(fallbackExperience);
       } finally {
         setIsLoading(false);

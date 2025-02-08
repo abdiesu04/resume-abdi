@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import Chat from '@/components/Chat';
 import { Toaster } from 'react-hot-toast';
+import Footer from '@/components/layout/Footer';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -29,7 +30,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
-      <body className="min-h-screen bg-background-darker font-sans antialiased">
+      <body className="min-h-screen bg-background-darker font-sans antialiased flex flex-col">
         <Toaster 
           position="top-right"
           toastOptions={{
@@ -53,7 +54,10 @@ export default function RootLayout({
             },
           }}
         />
-        {children}
+        <main className="flex-grow">
+          {children}
+        </main>
+        <Footer />
         <Chat />
       </body>
     </html>

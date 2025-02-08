@@ -16,6 +16,7 @@ export default function Chat() {
   const [isLoading, setIsLoading] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
 
   useEffect(() => {
@@ -28,6 +29,10 @@ export default function Chat() {
 
   useEffect(() => {
     scrollToBottom();
+    // Focus input after AI replies
+    if (messages.length > 0 && messages[messages.length - 1].sender === 'ai') {
+      inputRef.current?.focus();
+    }
   }, [messages]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -51,6 +56,10 @@ export default function Chat() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: userMessage.text }),
       });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
 
       const data = await response.json();
 
@@ -86,46 +95,58 @@ export default function Chat() {
   return (
     <>
       {/* Chat Toggle Button */}
-      <motion.button
-        className="fixed bottom-4 sm:bottom-8 right-4 sm:right-8 p-3 sm:p-4 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg hover:shadow-emerald-500/20 transition-all duration-300 z-50"
-        whileHover={{ scale: 1.05, boxShadow: '0 8px 32px rgba(16, 185, 129, 0.2)' }}
-        whileTap={{ scale: 0.95 }}
-        onClick={() => setIsChatOpen(!isChatOpen)}
-      >
-        <div className="relative">
-          <svg
-            className="w-5 h-5 sm:w-6 sm:h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            {isChatOpen ? (
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            ) : (
-              <>
+      <motion.div className="fixed bottom-4 sm:bottom-8 right-4 sm:right-8 flex flex-col items-center gap-2">
+        <motion.button
+          onClick={() => setIsChatOpen(true)}
+          className="bg-emerald-500 text-white px-3 py-1.5 rounded-full text-xs shadow-lg hover:bg-emerald-600 transition-colors duration-300"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          Ask me about Abdi! 👋
+        </motion.button>
+        <motion.button
+          className="p-3 sm:p-4 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg hover:shadow-emerald-500/20 transition-all duration-300 z-50"
+          whileHover={{ scale: 1.05, boxShadow: '0 8px 32px rgba(16, 185, 129, 0.2)' }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setIsChatOpen(!isChatOpen)}
+        >
+          <div className="relative">
+            <svg
+              className="w-5 h-5 sm:w-6 sm:h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              {isChatOpen ? (
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                  d="M6 18L18 6M6 6l12 12"
                 />
-                {isMounted && (
-                  <motion.div
-                    className="absolute -top-1 -right-1 w-2 sm:w-3 h-2 sm:h-3 bg-emerald-400 rounded-full"
-                    animate={{ scale: [1, 1.2, 1] }}
-                    transition={{ duration: 2, repeat: Infinity }}
+              ) : (
+                <>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
                   />
-                )}
-              </>
-            )}
-          </svg>
-        </div>
-      </motion.button>
+                  {isMounted && (
+                    <motion.div
+                      className="absolute -top-1 -right-1 w-2 sm:w-3 h-2 sm:h-3 bg-emerald-400 rounded-full"
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                  )}
+                </>
+              )}
+            </svg>
+          </div>
+        </motion.button>
+      </motion.div>
 
       {/* Chat Window */}
       <AnimatePresence>
@@ -135,7 +156,7 @@ export default function Chat() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-20 sm:bottom-28 right-4 sm:right-8 w-[calc(100vw-2rem)] sm:w-[400px] max-h-[75vh] sm:h-[600px] bg-gradient-to-b from-[#0D1627] to-[#1A2942] rounded-2xl shadow-2xl border border-gray-700/50 flex flex-col overflow-hidden z-50"
+            className="fixed bottom-20 sm:bottom-28 right-4 sm:right-8 w-[calc(100vw-2rem)] sm:w-[500px] max-h-[75vh] sm:h-[600px] bg-gradient-to-b from-[#0D1627] to-[#1A2942] rounded-2xl shadow-2xl border border-gray-700/50 flex flex-col overflow-hidden z-50"
           >
             {/* Chat Header */}
             <div className="p-3 sm:p-4 bg-gradient-to-r from-emerald-500/10 to-emerald-600/10 border-b border-gray-700/50 backdrop-blur-sm">
@@ -229,6 +250,7 @@ export default function Chat() {
             <form onSubmit={handleSubmit} className="p-3 sm:p-4 bg-gradient-to-r from-emerald-500/5 to-emerald-600/5 border-t border-gray-700/50">
               <div className="flex space-x-2">
                 <input
+                  ref={inputRef}
                   type="text"
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
@@ -264,4 +286,4 @@ export default function Chat() {
       </AnimatePresence>
     </>
   );
-} 
+}

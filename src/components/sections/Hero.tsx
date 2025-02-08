@@ -45,6 +45,43 @@ const socialLinks = [
   }
 ];
 
+function ParticlesEffect() {
+  const [particles, setParticles] = useState<Array<{ x: number; y: number; duration: number }>>([]);
+
+  useEffect(() => {
+    const newParticles = [...Array(20)].map(() => ({
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      duration: Math.random() * 10 + 20
+    }));
+    setParticles(newParticles);
+  }, []);
+
+  return (
+    <div className="absolute inset-0">
+      {particles.map((particle, i) => (
+        <motion.div
+          key={i}
+          className="absolute w-1 h-1 bg-emerald-400/30 rounded-full"
+          initial={{ 
+            x: `${particle.x}%`,
+            y: `${particle.y}%`
+          }}
+          animate={{
+            y: ["-10%", "110%"],
+            x: ["-10%", "110%"]
+          }}
+          transition={{
+            duration: particle.duration,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 export default function Hero() {
   const [mounted, setMounted] = useState(false);
   const [currentQuote, setCurrentQuote] = useState(0);
@@ -65,7 +102,7 @@ export default function Hero() {
 
   return (
     <div className="min-h-[80vh] flex flex-col lg:flex-row items-center justify-center px-4 py-8 lg:py-0 relative overflow-hidden">
-      {/* Background Effects */}
+      {/* Magical Background Effects */}
       <div className="absolute inset-0 bg-[#0A1120]">
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-transparent to-blue-500/10" />
         <motion.div
@@ -80,6 +117,8 @@ export default function Hero() {
           }}
           className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(16,185,129,0.1)_0%,_transparent_50%)]"
         />
+        {/* Only render particles after mounting */}
+        {mounted && <ParticlesEffect />}
       </div>
 
       {/* Left Side - Introduction */}
@@ -92,7 +131,7 @@ export default function Hero() {
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-400/10 text-emerald-400 text-sm border border-emerald-400/20"
+          className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-400/10 text-emerald-400 text-sm border border-emerald-400/20 hover:bg-emerald-400/20 transition-colors"
         >
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
@@ -108,10 +147,10 @@ export default function Hero() {
             transition={{ delay: 0.3 }}
             className="text-4xl sm:text-5xl lg:text-6xl font-bold"
           >
-            <span className="block text-white relative">
+            <span className="block text-white relative group">
               ABDI ESAYAS
               <motion.span
-                className="absolute -inset-1 bg-gradient-to-r from-emerald-400/20 to-blue-500/20 blur-lg"
+                className="absolute -inset-1 bg-gradient-to-r from-emerald-400/20 to-blue-500/20 blur-lg group-hover:opacity-100"
                 animate={{ opacity: [0.5, 0.8, 0.5] }}
                 transition={{ duration: 3, repeat: Infinity }}
               />
@@ -140,15 +179,6 @@ export default function Hero() {
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="flex flex-wrap gap-4 justify-center lg:justify-start"
-        >
-          <TechStack />
-        </motion.div>
-
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
           className="flex flex-col gap-6"
         >
@@ -167,7 +197,7 @@ export default function Hero() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#1E2D4A] text-gray-300 hover:text-emerald-400 hover:bg-[#1E2D4A]/80 transition-all group"
-                  whileHover={{ scale: 1.05 }}
+                  whileHover={{ scale: 1.05, x: 5 }}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.8 + index * 0.1 }}
@@ -179,42 +209,34 @@ export default function Hero() {
                 </motion.a>
               ))}
             </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.9 }}
-              className="flex items-center justify-center lg:justify-start gap-2 text-gray-400"
-            >
-              <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-              </svg>
-              <span className="text-sm font-mono">+251 938 813 894</span>
-            </motion.div>
           </div>
 
           {/* Action Buttons */}
           <div className="flex gap-4 justify-center lg:justify-start">
-            <Button variant="default" size="lg" className="group">
-              <span>View Projects</span>
-              <motion.span
-                className="ml-2 inline-block"
-                animate={{ x: [0, 4, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-              >
-                →
-              </motion.span>
-            </Button>
-            <Button variant="outline" size="lg" className="group">
-              <span>Download CV</span>
-              <motion.span
-                className="ml-2 inline-block opacity-0 group-hover:opacity-100"
-                animate={{ y: [0, -2, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-              >
-                ↓
-              </motion.span>
-            </Button>
+            <Link href="#projects">
+              <Button variant="default" size="lg" className="group">
+                <span>View Projects</span>
+                <motion.span
+                  className="ml-2 inline-block"
+                  animate={{ x: [0, 4, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                >
+                  →
+                </motion.span>
+              </Button>
+            </Link>
+            <a href="https://flowcv.com/resume/feswa5vi0s" target="_blank" rel="noopener noreferrer">
+              <Button variant="outline" size="lg" className="group">
+                <span>View Resume</span>
+                <motion.span
+                  className="ml-2 inline-block opacity-0 group-hover:opacity-100"
+                  animate={{ y: [0, -2, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                >
+                  ↗
+                </motion.span>
+              </Button>
+            </a>
           </div>
         </motion.div>
       </motion.div>
@@ -233,30 +255,6 @@ export default function Hero() {
     </div>
   );
 }
-
-const TechStack = () => {
-  const technologies = [
-    'Go', 'Python', 'TypeScript', 'Node.js',
-    'PostgreSQL', 'MongoDB', 'Redis', 'Docker'
-  ];
-
-  return (
-    <>
-      {technologies.map((tech, index) => (
-        <motion.div
-          key={tech}
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: index * 0.1 }}
-          whileHover={{ scale: 1.05, color: '#10B981' }}
-          className="px-3 py-1 bg-[#1E2D4A] text-gray-300 rounded-full text-sm font-mono border border-[#1E2D4A] hover:border-emerald-400/50 transition-colors"
-        >
-          {tech}
-        </motion.div>
-      ))}
-    </>
-  );
-};
 
 function CodePreview() {
   const [currentLine, setCurrentLine] = useState(0);
@@ -301,7 +299,7 @@ function CodePreview() {
   return (
     <div className="relative">
       <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/10 to-blue-500/10 rounded-lg filter blur-3xl" />
-      <div className="relative bg-[#0D1627] rounded-lg border border-[#1E2D4A] overflow-hidden shadow-2xl">
+      <div className="relative bg-[#0D1627] rounded-lg border border-[#1E2D4A] overflow-hidden shadow-2xl hover:border-emerald-400/50 transition-colors duration-300">
         <div className="flex items-center justify-between px-4 py-2 bg-[#1E2D4A]/50">
           <div className="flex items-center space-x-2">
             <div className="w-3 h-3 rounded-full bg-red-400" />

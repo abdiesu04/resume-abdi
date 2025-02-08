@@ -12,7 +12,7 @@ import Chat from '@/components/Chat';
 export default function Home() {
   return (
     <Layout>
-      <div className="space-y-24 pb-24">
+      <div className="space-y-8 pb-8">
         <section id="about">
           <Hero />
         </section>
@@ -37,7 +37,6 @@ export default function Home() {
 
         <section id="education" className="min-h-screen px-4">
           <div className="max-w-7xl mx-auto">
-            <h1>Eddu</h1>
             <Education />
           </div>
         </section>
@@ -52,4 +51,4 @@ export default function Home() {
       </div>
     </Layout>
   );
-} 
+}

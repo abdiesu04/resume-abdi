@@ -11,15 +11,13 @@ async function getPersonalContext() {
     const [projects, skills, education, experience, certificates] = await Promise.all([
       db.collection('projects').find().toArray(),
       db.collection('skills').find().toArray(),
-      db.collection('education').find().toArray(),
+      db.collection('education').find().toArray(), 
       db.collection('experience').find().toArray(),
-      db.collection('certificates').find().toArray(),
+      db.collection('certificates').find().toArray()
     ]);
 
     const context = `
-Database information about Abdi Esayas:
-
-Contact Information:
+About Abdi:
 - Email: [email protected]
 - Phone: +251 938 813 894
 - GitHub: github.com/abdiesu04
@@ -27,106 +25,83 @@ Contact Information:
 - Location: Addis Ababa, Ethiopia
 
 Skills:
-- Go (Golang)
-- Python (Django)
-- Java
-- C++
-- Javascript (Node.js, Next.js)
-- TypeScript
-- PHP
-- SQL
-- MongoDB
-- PostgreSQL
-- Docker
-${skills.map(skill => `- ${skill.name} (${skill.proficiency}%, ${skill.yearsOfExperience} years)`).join('\n')}
+${skills.map(s => `- ${s.name} (${s.proficiency}%, ${s.yearsOfExperience}y)`).join('\n')}
 
-Work Experience:
-${experience.map(exp => `
-• ${exp.position} at ${exp.company}
-  ${new Date(exp.startDate).toLocaleDateString()} - ${exp.endDate ? new Date(exp.endDate).toLocaleDateString() : 'Present'}
-  ${exp.location}
-  ${exp.description}
-  Tech stack: ${exp.technologies?.join(', ')}
-`).join('\n')}
+Experience:
+${experience.map(e => `• ${e.position} at ${e.company} (${e.technologies?.join(', ')})`).join('\n')}
 
 Education:
-${education.map(edu => `
-• ${edu.degree} in ${edu.field}
-  ${edu.institution}
-  ${new Date(edu.startDate).toLocaleDateString()} - ${edu.endDate ? new Date(edu.endDate).toLocaleDateString() : 'Present'}
-  ${edu.description}
-`).join('\n')}
+${education.map(e => `• ${e.degree} in ${e.field} at ${e.institution}`).join('\n')}
 
 Projects:
-${projects.map(project => `
-• ${project.title}
-  ${project.description}
-  Tech stack: ${project.technologies?.join(', ')}
-  ${project.liveUrl ? `Demo: ${project.liveUrl}` : ''}
-  ${project.githubUrl ? `Code: ${project.githubUrl}` : ''}
-`).join('\n')}
+${projects.map(p => `• ${p.title} - ${p.description}`).join('\n')}
 
-Certifications:
-${certificates.map(cert => `
-• ${cert.title}
-  From: ${cert.issuer}
-  Date: ${new Date(cert.date).toLocaleDateString()}
-`).join('\n')}
-`;
+Certificates:
+${certificates.map(c => `• ${c.title} from ${c.issuer}`).join('\n')}`;
 
     return context;
   } catch (error) {
-    console.error('Error fetching personal context:', error);
+    console.error('Error:', error);
     return '';
   }
 }
 
 let cachedContext: string | null = null;
+let conversationHistory: string[] = [];
 
 export async function generateAIResponse(userMessage: string) {
   try {
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-pro",
+      generationConfig: {
+        temperature: 0.6,
+        topP: 0.95,
+        topK: 40
+      }
+    });
+
     if (!cachedContext) {
       cachedContext = await getPersonalContext();
     }
 
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-pro",
-      generationConfig: {
-        temperature: 0.3,
-        topP: 0.8,
-        topK: 40
-      }
-    });
-    
+    conversationHistory.push(`User: ${userMessage}`);
+
     const prompt = `
 ${cachedContext}
+History: ${conversationHistory.slice(-6).join('\n')}
 
-Question: ${userMessage}
+You are a friendly AI assistant. Reply to: "${userMessage}"
 
-Instructions:
-1. Answer directly using only the information provided above
-2. Keep responses brief but highlight Abdi's strengths and achievements
-3. When information is not available, respond positively by highlighting related strengths:
-   - For communication skills: "Based on Abdi's experience leading projects and collaborating with teams, he demonstrates excellent communication and interpersonal skills"
-   - For technical abilities: "Abdi has proven expertise in [related skills] and consistently demonstrates the ability to quickly master new technologies"
-4. Use confident and enthusiastic language that emphasizes achievements
-5. Focus on showcasing Abdi's capabilities while maintaining accuracy
-6. Highlight relevant experience and skills that demonstrate excellence in the asked area
+Rules:
+1. Be casual and friendly - use emojis and informal language
+2. Keep responses brief but enthusiastic
+3. If the question is about Abdi, highlight his achievements and capabilities
+4. Be honest but focus on positives
+5. Stay upbeat and engaging
+6. You can discuss any topic, but keep responses appropriate and helpful
+7. Dont exagerate things too much
+8. be honest and dont lie
+10. dont tell skills that are not in the context
+11. you are not abdi you are an ai assistant
 `;
     
     const result = await model.generateContent(prompt);
     const response = await result.response;
-    const text = response.text();
+    if (!response) {
+      throw new Error('Empty response from AI');
+    }
+    const text = await response.text();
+    if (!text) {
+      throw new Error('Empty text from AI response');
+    }
+    conversationHistory.push(`AI: ${text}`);
     
-    return {
-      success: true,
-      message: text,
-    };
+    return { success: true, message: text };
   } catch (error) {
-    console.error('Error generating AI response:', error);
+    console.error('Error:', error);
     return {
       success: false,
-      message: 'Sorry, I encountered an error. Please try again.',
+      message: "Oops! 😅 Having some technical hiccups. Mind trying again?"
     };
   }
-} 
+}
