@@ -207,7 +207,10 @@ export default function Certificates() {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleVisibilityToggle(cert.visible, cert._id!);
+                      const id = cert._id;
+                      if (id) {
+                        handleVisibilityToggle(cert.visible, id);
+                      }
                     }}
                     className={`mt-4 px-3 py-1 text-xs font-mono rounded-full
                       ${cert.visible 

@@ -227,11 +227,15 @@ export default function CertificateForm() {
                 </div>
                 <div className="flex space-x-2">
                   <button
-                    onClick={() => handleVisibilityToggle(certificate._id, certificate.visible)}
+                    onClick={() => {
+                      if (certificate._id) {
+                        handleVisibilityToggle(certificate._id, certificate.visible);
+                      }
+                    }}
                     className={`p-1 rounded-lg transition-colors ${
                       certificate.visible 
                         ? 'hover:bg-gray-700 text-emerald-400'
-                        : 'hover:bg-emerald-400/10 text-gray-400 hover:text-emerald-400'
+                        : 'hover:bg-gray-700 text-gray-500'
                     }`}
                   >
                     {certificate.visible ? (

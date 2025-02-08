@@ -169,9 +169,9 @@ export default function Skills() {
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {filteredSkills.map((skill) => (
+            {filteredSkills.map((skill, index) => (
               <motion.div
-                key={skill._id}
+                key={skill._id || index}
                 onClick={() => skill._id && setExpandedSkill(expandedSkill === skill._id ? null : skill._id)}
                 whileHover={{ scale: 1.02 }}
                 className={`bg-gradient-to-br from-[#0D1627] to-[#1A2942] rounded-lg border border-gray-800 p-3
