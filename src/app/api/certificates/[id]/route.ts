@@ -1,13 +1,13 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 
 export async function GET(
-  request: Request,
-  context: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: { id: string } }
 ) {
   try {
-    const id = context.params.id;
+    const id = params.id;
     if (!id || !ObjectId.isValid(id)) {
       return NextResponse.json(
         { success: false, error: 'Invalid certificate ID' },
@@ -40,11 +40,11 @@ export async function GET(
 }
 
 export async function PATCH(
-  request: Request,
-  context: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: { id: string } }
 ) {
   try {
-    const id = context.params.id;
+    const id = params.id;
     if (!id || !ObjectId.isValid(id)) {
       return NextResponse.json(
         { success: false, error: 'Invalid certificate ID' },
@@ -100,11 +100,11 @@ export async function PATCH(
 }
 
 export async function PUT(
-  request: Request,
-  context: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: { id: string } }
 ) {
   try {
-    const id = context.params.id;
+    const id = params.id;
     if (!id || !ObjectId.isValid(id)) {
       return NextResponse.json(
         { success: false, error: 'Invalid certificate ID' },
@@ -162,11 +162,11 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: Request,
-  context: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: { id: string } }
 ) {
   try {
-    const id = context.params.id;
+    const id = params.id;
     if (!id || !ObjectId.isValid(id)) {
       return NextResponse.json(
         { success: false, error: 'Invalid certificate ID' },

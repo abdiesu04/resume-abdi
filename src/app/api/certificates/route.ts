@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     if (!request.headers.get('content-type')?.includes('application/json')) {
       return NextResponse.json(
@@ -45,9 +45,9 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = request.nextUrl;
     const isAdmin = searchParams.get('admin') === 'true';
 
     const client = await clientPromise;
