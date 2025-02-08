@@ -45,13 +45,19 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const isAdmin = searchParams.get('admin') === 'true';
+
     const client = await clientPromise;
     const db = client.db('portfolio');
     
+    // If admin view, show all certificates, otherwise only show visible ones
+    const query = isAdmin ? {} : { visible: true };
+    
     const certificates = await db.collection('certificates')
-      .find({ visible: true })
+      .find(query)
       .sort({ date: -1 })
       .toArray();
 

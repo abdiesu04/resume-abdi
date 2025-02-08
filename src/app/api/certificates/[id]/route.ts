@@ -4,14 +4,22 @@ import { ObjectId } from 'mongodb';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
+    const id = context.params.id;
+    if (!id || !ObjectId.isValid(id)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid certificate ID' },
+        { status: 400 }
+      );
+    }
+
     const client = await clientPromise;
     const db = client.db('portfolio');
     
     const certificate = await db.collection('certificates').findOne({
-      _id: new ObjectId(params.id)
+      _id: new ObjectId(id)
     });
 
     if (!certificate) {
@@ -33,9 +41,17 @@ export async function GET(
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
+    const id = context.params.id;
+    if (!id || !ObjectId.isValid(id)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid certificate ID' },
+        { status: 400 }
+      );
+    }
+
     if (!request.headers.get('content-type')?.includes('application/json')) {
       return NextResponse.json(
         { success: false, error: 'Content type must be application/json' },
@@ -56,7 +72,7 @@ export async function PATCH(
     }
 
     const result = await db.collection('certificates').findOneAndUpdate(
-      { _id: new ObjectId(params.id) },
+      { _id: new ObjectId(id) },
       { 
         $set: { 
           visible: data.visible,
@@ -85,9 +101,17 @@ export async function PATCH(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
+    const id = context.params.id;
+    if (!id || !ObjectId.isValid(id)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid certificate ID' },
+        { status: 400 }
+      );
+    }
+
     if (!request.headers.get('content-type')?.includes('application/json')) {
       return NextResponse.json(
         { success: false, error: 'Content type must be application/json' },
@@ -115,7 +139,7 @@ export async function PUT(
     };
 
     const result = await db.collection('certificates').findOneAndUpdate(
-      { _id: new ObjectId(params.id) },
+      { _id: new ObjectId(id) },
       { $set: updateData },
       { returnDocument: 'after' }
     );
@@ -139,10 +163,11 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
-    if (!params.id || !ObjectId.isValid(params.id)) {
+    const id = context.params.id;
+    if (!id || !ObjectId.isValid(id)) {
       return NextResponse.json(
         { success: false, error: 'Invalid certificate ID' },
         { status: 400 }
@@ -154,7 +179,7 @@ export async function DELETE(
 
     // First check if the certificate exists
     const certificate = await db.collection('certificates').findOne({
-      _id: new ObjectId(params.id)
+      _id: new ObjectId(id)
     });
 
     if (!certificate) {
@@ -166,7 +191,7 @@ export async function DELETE(
 
     // Perform the deletion
     const result = await db.collection('certificates').deleteOne({
-      _id: new ObjectId(params.id)
+      _id: new ObjectId(id)
     });
 
     if (result.deletedCount === 0) {
