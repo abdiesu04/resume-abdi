@@ -250,7 +250,11 @@ export default function CertificateForm() {
                     )}
                   </button>
                   <button
-                    onClick={() => handleDelete(certificate._id)}
+                    onClick={() => {
+                      if (certificate._id) {
+                        handleDelete(certificate._id);
+                      }
+                    }}
                     className="p-1 text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

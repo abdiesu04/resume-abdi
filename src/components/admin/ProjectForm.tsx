@@ -282,7 +282,7 @@ export default function ProjectForm() {
                     <motion.button
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
-                      onClick={() => handleVisibilityToggle(project._id!, project.visible)}
+                      onClick={() => handleVisibilityToggle(project._id as string, project.visible)}
                       className={`p-2 rounded-full ${
                         project.visible ? 'text-emerald-400 hover:text-emerald-500' : 'text-red-400 hover:text-red-500'
                       } transition-colors`}
@@ -313,7 +313,7 @@ export default function ProjectForm() {
                     <motion.button
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
-                      onClick={() => setDeleteModal({ isOpen: true, projectId: project._id })}
+                      onClick={() => setDeleteModal({ isOpen: true, projectId: project._id as string })}
                       className="p-2 rounded-full text-red-400 hover:text-red-500 transition-colors"
                     >
                       <svg
@@ -348,4 +348,4 @@ export default function ProjectForm() {
       />
     </div>
   );
-} 
+}

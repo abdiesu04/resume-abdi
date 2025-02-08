@@ -8,7 +8,7 @@ export default function EducationForm() {
     institution: '',
     degree: '',
     field: '',
-    startDate: '',
+    startDate: new Date().toISOString().split('T')[0], // Initialize with current date in YYYY-MM-DD format
     endDate: '',
     location: '',
     description: '',
@@ -58,7 +58,7 @@ export default function EducationForm() {
           institution: '',
           degree: '',
           field: '',
-          startDate: '',
+          startDate: new Date().toISOString().split('T')[0],
           endDate: '',
           location: '',
           description: '',
@@ -161,7 +161,7 @@ export default function EducationForm() {
               </label>
               <input
                 type="date"
-                value={formData.startDate}
+                value={formData.startDate?.toString() || ''}
                 onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
                 className="w-full px-4 py-2 rounded-md bg-[#1E2D4A] border border-gray-700 text-white focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400"
                 required
@@ -174,7 +174,7 @@ export default function EducationForm() {
               </label>
               <input
                 type="date"
-                value={formData.endDate}
+                value={formData.endDate?.toString() || ''}
                 onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
                 className="w-full px-4 py-2 rounded-md bg-[#1E2D4A] border border-gray-700 text-white focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400"
               />
@@ -257,7 +257,7 @@ export default function EducationForm() {
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
-                    onClick={() => setDeleteModal({ isOpen: true, educationId: edu._id })}
+                    onClick={() => setDeleteModal({ isOpen: true, educationId: edu._id || '' })}
                     className="text-red-400 hover:text-red-500 transition-colors"
                   >
                     <svg
