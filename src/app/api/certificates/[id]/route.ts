@@ -2,12 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 
+interface RouteContext {
+  params: {
+    id: string;
+  };
+}
+
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  context: RouteContext
 ) {
   try {
-    const id = params.id;
+    const id = context.params.id;
     if (!id || !ObjectId.isValid(id)) {
       return NextResponse.json(
         { success: false, error: 'Invalid certificate ID' },
@@ -41,10 +47,10 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: RouteContext
 ) {
   try {
-    const id = params.id;
+    const id = context.params.id;
     if (!id || !ObjectId.isValid(id)) {
       return NextResponse.json(
         { success: false, error: 'Invalid certificate ID' },
@@ -100,10 +106,10 @@ export async function PATCH(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: RouteContext
 ) {
   try {
-    const id = params.id;
+    const id = context.params.id;
     if (!id || !ObjectId.isValid(id)) {
       return NextResponse.json(
         { success: false, error: 'Invalid certificate ID' },
@@ -159,11 +165,11 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  context: RouteContext
 ) {
   try {
-    const id = params.id;
+    const id = context.params.id;
     if (!id || !ObjectId.isValid(id)) {
       return NextResponse.json(
         { success: false, error: 'Invalid certificate ID' },
