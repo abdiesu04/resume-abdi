@@ -30,7 +30,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
-      <head />
       <body className="min-h-screen bg-background-darker font-sans antialiased flex flex-col">
         <Toaster 
           position="top-right"
