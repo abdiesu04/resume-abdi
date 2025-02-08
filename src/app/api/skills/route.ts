@@ -14,9 +14,11 @@ export async function POST(request: NextRequest) {
     const data = await request.json();
 
     // Validate required fields
-    if (!data.name || !data.category || typeof data.proficiency !== 'number' || typeof data.yearsOfExperience !== 'number') {
+    if (!data.name || !data.category || 
+        typeof data.proficiency === 'undefined' || 
+        typeof data.yearsOfExperience === 'undefined') {
       return NextResponse.json(
-        { success: false, error: 'Missing or invalid required fields' },
+        { success: false, error: 'Missing required fields' },
         { status: 400 }
       );
     }
@@ -24,6 +26,13 @@ export async function POST(request: NextRequest) {
     // Ensure numeric values are within valid ranges
     const proficiency = Math.min(Math.max(0, Number(data.proficiency)), 100);
     const yearsOfExperience = Math.max(0, Number(data.yearsOfExperience));
+
+    if (isNaN(proficiency) || isNaN(yearsOfExperience)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid numeric values for proficiency or years of experience' },
+        { status: 400 }
+      );
+    }
 
     const skill: Partial<Skill> = {
       name: data.name,
@@ -66,7 +75,8 @@ export async function GET() {
     const formattedSkills = skills.map(skill => ({
       ...skill,
       proficiency: Math.min(Math.max(0, Number(skill.proficiency) || 0), 100),
-      yearsOfExperience: Math.max(0, Number(skill.yearsOfExperience) || 0)
+      yearsOfExperience: Math.max(0, Number(skill.yearsOfExperience) || 0),
+      visible: skill.visible ?? true
     }));
 
     return NextResponse.json({ success: true, data: formattedSkills });
