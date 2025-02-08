@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { Skill } from '@/lib/models';
+import { Document } from 'mongodb';
 
 export async function POST(request: NextRequest) {
   try {
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const skill: Partial<Skill> = {
+    const skillData: Document = {
       name: data.name,
       category: data.category,
       proficiency,
@@ -45,11 +46,11 @@ export async function POST(request: NextRequest) {
 
     const client = await clientPromise;
     const db = client.db('portfolio');
-    const result = await db.collection('skills').insertOne(skill);
+    const result = await db.collection('skills').insertOne(skillData);
 
     return NextResponse.json({
       success: true,
-      data: { ...skill, _id: result.insertedId }
+      data: { ...skillData, _id: result.insertedId }
     });
   } catch (error) {
     console.error('Error in POST /api/skills:', error);
