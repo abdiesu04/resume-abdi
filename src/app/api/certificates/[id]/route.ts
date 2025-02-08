@@ -1,32 +1,69 @@
 import { NextRequest, NextResponse } from 'next/server';
-import clientPromise from '@/lib/mongodb';
-import { ObjectId } from 'mongodb';
 
-interface RouteContext {
-  params: {
-    id: string;
-  };
+// Define certificate type
+type Certificate = {
+  _id: string;
+  title: string;
+  issuer: string;
+  date: Date;
+  imageUrl: string;
+  verificationUrl: string;
+  visible: boolean;
+  createdAt: Date;
+  updatedAt?: Date;
 }
+
+// Import the certificates array from the parent route
+const certificates: Certificate[] = [
+  {
+    _id: '1',
+    title: 'AWS Certified Solutions Architect',
+    issuer: 'Amazon Web Services',
+    date: new Date('2023-12-15'),
+    imageUrl: 'https://example.com/aws-cert.png',
+    verificationUrl: 'https://aws.amazon.com/verify',
+    visible: true,
+    createdAt: new Date('2023-12-15')
+  },
+  {
+    _id: '2',
+    title: 'Professional Full Stack Developer',
+    issuer: 'Meta',
+    date: new Date('2023-10-20'),
+    imageUrl: 'https://example.com/meta-cert.png',
+    verificationUrl: 'https://meta.com/verify',
+    visible: true,
+    createdAt: new Date('2023-10-20')
+  },
+  {
+    _id: '3',
+    title: 'Python for Data Science',
+    issuer: 'IBM',
+    date: new Date('2023-08-05'),
+    imageUrl: 'https://example.com/ibm-cert.png',
+    verificationUrl: 'https://ibm.com/verify',
+    visible: true,
+    createdAt: new Date('2023-08-05')
+  },
+  {
+    _id: '4',
+    title: 'React Native Specialist',
+    issuer: 'Microsoft',
+    date: new Date('2023-06-30'),
+    imageUrl: 'https://example.com/microsoft-cert.png',
+    verificationUrl: 'https://microsoft.com/verify',
+    visible: true,
+    createdAt: new Date('2023-06-30')
+  }
+];
 
 export async function GET(
   _request: NextRequest,
-  context: RouteContext
+  context: { params: { id: string } }
 ) {
   try {
     const id = context.params.id;
-    if (!id || !ObjectId.isValid(id)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid certificate ID' },
-        { status: 400 }
-      );
-    }
-
-    const client = await clientPromise;
-    const db = client.db('portfolio');
-    
-    const certificate = await db.collection('certificates').findOne({
-      _id: new ObjectId(id)
-    });
+    const certificate = certificates.find(cert => cert._id === id);
 
     if (!certificate) {
       return NextResponse.json(
@@ -47,17 +84,11 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  context: RouteContext
+  context: { params: { id: string } }
 ) {
   try {
     const id = context.params.id;
-    if (!id || !ObjectId.isValid(id)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid certificate ID' },
-        { status: 400 }
-      );
-    }
-
+    
     if (!request.headers.get('content-type')?.includes('application/json')) {
       return NextResponse.json(
         { success: false, error: 'Content type must be application/json' },
@@ -65,8 +96,6 @@ export async function PATCH(
       );
     }
 
-    const client = await clientPromise;
-    const db = client.db('portfolio');
     const data = await request.json();
 
     if (typeof data.visible !== 'boolean') {
@@ -76,25 +105,25 @@ export async function PATCH(
       );
     }
 
-    const result = await db.collection('certificates').findOneAndUpdate(
-      { _id: new ObjectId(id) },
-      { 
-        $set: { 
-          visible: data.visible,
-          updatedAt: new Date()
-        } 
-      },
-      { returnDocument: 'after' }
-    );
-
-    if (!result) {
+    const certificateIndex = certificates.findIndex(cert => cert._id === id);
+    
+    if (certificateIndex === -1) {
       return NextResponse.json(
         { success: false, error: 'Certificate not found' },
         { status: 404 }
       );
     }
 
-    return NextResponse.json({ success: true, data: result });
+    certificates[certificateIndex] = {
+      ...certificates[certificateIndex],
+      visible: data.visible,
+      updatedAt: new Date()
+    };
+
+    return NextResponse.json({ 
+      success: true, 
+      data: certificates[certificateIndex] 
+    });
   } catch (error) {
     console.error('Error updating certificate visibility:', error);
     return NextResponse.json(
@@ -106,16 +135,10 @@ export async function PATCH(
 
 export async function PUT(
   request: NextRequest,
-  context: RouteContext
+  context: { params: { id: string } }
 ) {
   try {
     const id = context.params.id;
-    if (!id || !ObjectId.isValid(id)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid certificate ID' },
-        { status: 400 }
-      );
-    }
 
     if (!request.headers.get('content-type')?.includes('application/json')) {
       return NextResponse.json(
@@ -124,8 +147,6 @@ export async function PUT(
       );
     }
 
-    const client = await clientPromise;
-    const db = client.db('portfolio');
     const data = await request.json();
 
     if (!data.title || !data.issuer || !data.date) {
@@ -135,26 +156,25 @@ export async function PUT(
       );
     }
 
-    const updateData = {
-      ...data,
-      date: new Date(data.date),
-      updatedAt: new Date()
-    };
-
-    const result = await db.collection('certificates').findOneAndUpdate(
-      { _id: new ObjectId(id) },
-      { $set: updateData },
-      { returnDocument: 'after' }
-    );
-
-    if (!result) {
+    const certificateIndex = certificates.findIndex(cert => cert._id === id);
+    
+    if (certificateIndex === -1) {
       return NextResponse.json(
         { success: false, error: 'Certificate not found' },
         { status: 404 }
       );
     }
 
-    return NextResponse.json({ success: true, data: result });
+    const updateData = {
+      ...certificates[certificateIndex],
+      ...data,
+      date: new Date(data.date),
+      updatedAt: new Date()
+    };
+
+    certificates[certificateIndex] = updateData;
+
+    return NextResponse.json({ success: true, data: updateData });
   } catch (error) {
     console.error('Error updating certificate:', error);
     return NextResponse.json(
@@ -166,41 +186,20 @@ export async function PUT(
 
 export async function DELETE(
   _request: NextRequest,
-  context: RouteContext
+  context: { params: { id: string } }
 ) {
   try {
     const id = context.params.id;
-    if (!id || !ObjectId.isValid(id)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid certificate ID' },
-        { status: 400 }
-      );
-    }
-
-    const client = await clientPromise;
-    const db = client.db('portfolio');
-
-    const certificate = await db.collection('certificates').findOne({
-      _id: new ObjectId(id)
-    });
-
-    if (!certificate) {
+    const certificateIndex = certificates.findIndex(cert => cert._id === id);
+    
+    if (certificateIndex === -1) {
       return NextResponse.json(
         { success: false, error: 'Certificate not found' },
         { status: 404 }
       );
     }
 
-    const result = await db.collection('certificates').deleteOne({
-      _id: new ObjectId(id)
-    });
-
-    if (result.deletedCount === 0) {
-      return NextResponse.json(
-        { success: false, error: 'Failed to delete certificate' },
-        { status: 500 }
-      );
-    }
+    certificates.splice(certificateIndex, 1);
 
     return NextResponse.json({ 
       success: true, 
