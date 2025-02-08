@@ -2,15 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 
-type RouteParams = {
-  params: {
-    id: string;
-  };
-};
-
 export async function GET(
   request: NextRequest,
-  { params }: RouteParams
+  { params }: { params: { id: string } }
 ) {
   try {
     const id = params.id;
@@ -47,7 +41,7 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: RouteParams
+  { params }: { params: { id: string } }
 ) {
   try {
     const id = params.id;
@@ -69,7 +63,6 @@ export async function PATCH(
     const db = client.db('portfolio');
     const data = await request.json();
 
-    // For visibility toggle, we only need the visible field
     if (typeof data.visible !== 'boolean') {
       return NextResponse.json(
         { success: false, error: 'Visibility must be a boolean' },
@@ -107,7 +100,7 @@ export async function PATCH(
 
 export async function PUT(
   request: NextRequest,
-  { params }: RouteParams
+  { params }: { params: { id: string } }
 ) {
   try {
     const id = params.id;
@@ -129,7 +122,6 @@ export async function PUT(
     const db = client.db('portfolio');
     const data = await request.json();
 
-    // Validate required fields
     if (!data.title || !data.issuer || !data.date) {
       return NextResponse.json(
         { success: false, error: 'Missing required fields' },
@@ -137,7 +129,6 @@ export async function PUT(
       );
     }
 
-    // Prepare update data
     const updateData = {
       ...data,
       date: new Date(data.date),
@@ -169,7 +160,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: RouteParams
+  { params }: { params: { id: string } }
 ) {
   try {
     const id = params.id;
@@ -183,7 +174,6 @@ export async function DELETE(
     const client = await clientPromise;
     const db = client.db('portfolio');
 
-    // First check if the certificate exists
     const certificate = await db.collection('certificates').findOne({
       _id: new ObjectId(id)
     });
@@ -195,7 +185,6 @@ export async function DELETE(
       );
     }
 
-    // Perform the deletion
     const result = await db.collection('certificates').deleteOne({
       _id: new ObjectId(id)
     });
@@ -218,4 +207,4 @@ export async function DELETE(
       { status: 500 }
     );
   }
-} 
+}
