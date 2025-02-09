@@ -4,11 +4,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ReactNode, useState, useEffect } from 'react';
 import Link from 'next/link';
 
-interface LayoutProps {
-  children: ReactNode;
+interface NavItem {
+  id: string;
+  name: string;
+  href: string;
+  isSpecial?: boolean;
 }
 
-const navItems = [
+const navItems: NavItem[] = [
   { id: 'about', name: 'About', href: '#about' },
   { id: 'skills', name: 'Skills', href: '#skills' },
   { id: 'experience', name: 'Experience', href: '#experience' },
@@ -16,6 +19,10 @@ const navItems = [
   { id: 'education', name: 'Education', href: '#education' },
   { id: 'certificates', name: 'Certificates', href: '#certificates' }
 ];
+
+interface LayoutProps {
+  children: ReactNode;
+}
 
 export default function Layout({ children }: LayoutProps) {
   const [mounted, setMounted] = useState(false);
@@ -29,38 +36,44 @@ export default function Layout({ children }: LayoutProps) {
       const sections = navItems.map(item => item.href.slice(1));
       const scrollPosition = window.scrollY + 100;
 
+      let currentSection = '';
       for (const section of sections) {
         const element = document.getElementById(section);
         if (element) {
           const { offsetTop, offsetHeight } = element;
           if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
-            setActiveSection(section);
+            currentSection = section;
             break;
           }
         }
       }
+      setActiveSection(currentSection);
     };
 
     window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Call once on mount to set initial active section
+    
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      const offset = 80; // Account for fixed header
+      const offset = 80;
       const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - offset;
+      const offsetPosition = elementPosition + window.scrollY - offset;
 
       window.scrollTo({
         top: offsetPosition,
         behavior: 'smooth'
       });
       
-      setIsMobileMenuOpen(false); // Close mobile menu after clicking
-      setActiveSection(sectionId); // Update active section
+      setIsMobileMenuOpen(false);
+      setActiveSection(sectionId);
     }
   };
+
+  if (!mounted) return null;
 
   return (
     <div className="min-h-screen bg-[#0A1120] text-gray-100">
@@ -81,7 +94,7 @@ export default function Layout({ children }: LayoutProps) {
           <div className="hidden md:flex items-center space-x-1">
             {navItems.map((item) => (
               <motion.button
-                key={item.name}
+                key={item.id}
                 onClick={() => scrollToSection(item.href.slice(1))}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors relative group ${
                   activeSection === item.href.slice(1)
@@ -151,7 +164,7 @@ export default function Layout({ children }: LayoutProps) {
               <div className="max-w-7xl mx-auto py-4 px-4 space-y-2">
                 {navItems.map((item) => (
                   <motion.button
-                    key={item.name}
+                    key={item.id}
                     onClick={() => scrollToSection(item.href.slice(1))}
                     className={`w-full px-4 py-3 rounded-md text-left text-sm font-medium transition-colors ${
                       activeSection === item.href.slice(1)
@@ -181,55 +194,6 @@ export default function Layout({ children }: LayoutProps) {
       <main className="pt-16">
         {children}
       </main>
-
-      {/* Development Tools Overlay */}
-      {mounted && (
-        <motion.div 
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="fixed bottom-4 left-1/2 -translate-x-1/2 flex items-center space-x-2 px-4 py-2 bg-[#1E2D4A]/80 backdrop-blur-md rounded-full border border-[#1E2D4A] shadow-lg"
-        >
-          <StatusIndicator />
-          <span className="text-xs font-mono text-gray-400">|</span>
-          <PerformanceMetric label="Memory" value="512MB" />
-          <span className="text-xs font-mono text-gray-400">|</span>
-          <PerformanceMetric label="CPU" value="2.4GHz" />
-          <span className="text-xs font-mono text-gray-400">|</span>
-          <PerformanceMetric label="Uptime" value="99.9%" />
-        </motion.div>
-      )}
     </div>
   );
 }
-
-const DevMetric = ({ icon, label, value }: { icon: string; label: string; value: string }) => (
-  <motion.div 
-    whileHover={{ scale: 1.05 }}
-    className="flex items-center space-x-2"
-  >
-    <span className="text-lg">{icon}</span>
-    <div className="text-xs font-mono">
-      <span className="text-gray-400">{label}:</span>{' '}
-      <span className="text-emerald-400">{value}</span>
-    </div>
-  </motion.div>
-);
-
-const StatusIndicator = () => (
-  <div className="flex items-center space-x-2">
-    <div className="relative">
-      <div className="w-2 h-2 rounded-full bg-emerald-400" />
-      <div className="absolute inset-0 w-2 h-2 rounded-full bg-emerald-400 animate-ping opacity-50" />
-    </div>
-    <span className="text-xs font-mono text-emerald-400">ONLINE</span>
-  </div>
-);
-
-const PerformanceMetric = ({ label, value }: { label: string; value: string }) => (
-  <div className="flex items-center space-x-2">
-    <span className="text-xs font-mono">
-      <span className="text-gray-400">{label}:</span>{' '}
-      <span className="text-blue-400">{value}</span>
-    </span>
-  </div>
-); 
