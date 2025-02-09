@@ -308,7 +308,7 @@ export default function Hero() {
             </Link>
             <a href="https://flowcv.com/resume/feswa5vi0s" target="_blank" rel="noopener noreferrer">
               <Button variant="outline" size="lg" className="group font-mono text-sm sm:text-base">
-                <span>DOWNLOAD_CV</span>
+                <span>RESUME</span>
               </Button>
             </a>
           </div>
