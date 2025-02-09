@@ -18,7 +18,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'ABDI ESAYAS | Secure Technical Portfolio',
+  title: 'ABDI ESAYAS | Software Engineer Portfolio',
   description: 'Full Stack Developer specialized in building secure, scalable applications with military-grade precision.',
   keywords: ['Full Stack Developer', 'Software Engineer', 'Go', 'Python', 'JavaScript', 'Next.js'],
 };

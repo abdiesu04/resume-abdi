@@ -14,8 +14,7 @@ const navItems = [
   { id: 'experience', name: 'Experience', href: '#experience' },
   { id: 'projects', name: 'Projects', href: '#projects' },
   { id: 'education', name: 'Education', href: '#education' },
-  { id: 'certificates', name: 'Certificates', href: '#certificates' },
-  { id: 'chat', name: 'AI Chat', href: '#chat', isSpecial: true },
+  { id: 'certificates', name: 'Certificates', href: '#certificates' }
 ];
 
 export default function Layout({ children }: LayoutProps) {
