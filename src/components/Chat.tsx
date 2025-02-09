@@ -162,7 +162,7 @@ export default function Chat() {
             <div className="p-3 sm:p-4 bg-gradient-to-r from-emerald-500/10 to-emerald-600/10 border-b border-gray-700/50 backdrop-blur-sm">
               <div className="flex items-center space-x-2">
                 <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <h3 className="text-base sm:text-lg font-semibold text-white">AI Assistant</h3>
+                <h3 className="text-base sm:text-lg font-semibold text-white">Birke</h3>
               </div>
               <p className="text-xs sm:text-sm text-gray-400 mt-1">Ask me anything about Abdi's experience and skills</p>
             </div>
