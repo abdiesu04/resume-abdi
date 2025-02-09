@@ -17,6 +17,9 @@ async function getPersonalContext() {
     ]);
 
     const context = `
+
+First Rule : Dont ever lie about my skill or a project make sure only to presnt my work only if you couldnt find the infomration user
+asked reply you have no infomation in polite way  
 About Abdi:
 - Email: [email protected]
 - Phone: +251 938 813 894
@@ -70,7 +73,7 @@ export async function generateAIResponse(userMessage: string) {
     const model = genAI.getGenerativeModel({ 
       model: "gemini-pro",
       generationConfig: {
-        temperature: 0.6,
+        temperature: 0.01,
         topP: 0.95,
         topK: 40
       }
