@@ -201,11 +201,17 @@ export default function ExperienceForm() {
             </label>
             <input
               type="text"
-              value={formData.technologies?.join(', ')}
-              onChange={(e) => setFormData({ 
-                ...formData, 
-                technologies: e.target.value.split(',').map(t => t.trim()).filter(Boolean)
-              })}
+              value={formData.technologies?.join(', ') || ''}
+              onChange={(e) => {
+                const techs = e.target.value
+                  .split(',')
+                  .map(tech => tech.trim())
+                  .filter(tech => tech.length > 0);
+                setFormData({
+                  ...formData,
+                  technologies: techs
+                });
+              }}
               className="w-full px-4 py-2 rounded-md bg-[#1E2D4A] border border-gray-700 text-white focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400"
               placeholder="React, Node.js, MongoDB"
             />
